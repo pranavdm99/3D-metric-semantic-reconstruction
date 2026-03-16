@@ -1,0 +1,86 @@
+# .gitignore for Physics-Ready Video Pipeline
+
+# Data directories
+data/raw_video/*.mp4
+data/raw_video/*.mov
+data/raw_video/*.avi
+data/raw_video/frames/
+data/outputs/
+data/checkpoints/
+!data/checkpoints/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# PyTorch
+*.pth
+*.pt
+*.ckpt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
+
+# Logs
+*.log
+logs/
+tensorboard/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# COLMAP
+*.db
+*.db-shm
+*.db-wal
+
+# MuJoCo
+*.mjb
+
+# Meshes (large files)
+*.obj
+*.ply
+*.stl
+!data/outputs/meshes/.gitkeep
+
+# Videos (large files)
+*.mp4
+*.mov
+*.avi
+!data/raw_video/.gitkeep
