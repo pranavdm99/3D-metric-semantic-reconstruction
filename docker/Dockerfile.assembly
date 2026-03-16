@@ -3,7 +3,7 @@ FROM physics-video-pipeline-base:latest
 
 # Install MuJoCo 3.x
 RUN cd /tmp && \
-    wget https://github.com/google-deepmind/mujoco/releases/download/3.1.0/mujoco-3.1.0-linux-x86_64.tar.gz && \
+    for i in {1..5}; do wget https://github.com/google-deepmind/mujoco/releases/download/3.1.0/mujoco-3.1.0-linux-x86_64.tar.gz && break || sleep 5; done && \
     tar -xzf mujoco-3.1.0-linux-x86_64.tar.gz && \
     mkdir -p /root/.mujoco && \
     mv mujoco-3.1.0 /root/.mujoco/mujoco310 && \

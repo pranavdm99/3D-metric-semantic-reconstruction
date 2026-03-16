@@ -2,10 +2,11 @@
 FROM physics-video-pipeline-base:latest
 
 # Install mesh processing libraries
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    for i in {1..5}; do apt-get install -y \
     libeigen3-dev \
-    libboost-all-dev \
-    && rm -rf /var/lib/apt/lists/*
+    libboost-all-dev && break || sleep 5; done && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Python mesh processing tools
 RUN pip install --no-cache-dir \
@@ -21,7 +22,7 @@ RUN pip install --no-cache-dir \
 # CoACD upstream can occasionally break due to dependency/toolchain changes.
 # Keep image build resilient and fall back to V-HACD at runtime if CoACD fails.
 RUN set -eux; \
-        git clone --recursive https://github.com/SarahWeiii/CoACD.git /tmp/CoACD; \
+        for i in {1..5}; do git clone --recursive https://github.com/SarahWeiii/CoACD.git /tmp/CoACD && break || sleep 5; done; \
         cd /tmp/CoACD; \
         mkdir build; \
         cd build; \
@@ -36,7 +37,7 @@ RUN set -eux; \
         rm -rf /tmp/CoACD
 
 # Install V-HACD as fallback
-RUN git clone https://github.com/kmammou/v-hacd.git /tmp/v-hacd && \
+RUN for i in {1..5}; do git clone https://github.com/kmammou/v-hacd.git /tmp/v-hacd && break || sleep 5; done && \
     cd /tmp/v-hacd/app && \
     mkdir build && cd build && \
     cmake .. && \

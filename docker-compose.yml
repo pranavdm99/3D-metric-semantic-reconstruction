@@ -121,11 +121,11 @@ services:
       - NVIDIA_VISIBLE_DEVICES=0
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
     volumes:
-      - ./data:/workspace/project/data
-      - ./src:/workspace/project/src
-      - ./configs:/workspace/project/configs
-      - ./scripts:/workspace/project/scripts
-    working_dir: /workspace/project
+      - ./data:/workspace/data
+      - ./src:/workspace/src
+      - ./configs:/workspace/configs
+      - ./scripts:/workspace/scripts
+    working_dir: /workspace
     command: /bin/bash
     stdin_open: true
     tty: true

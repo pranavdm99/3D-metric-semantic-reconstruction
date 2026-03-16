@@ -2,7 +2,9 @@
 FROM physics-video-pipeline-base:latest
 
 # Install Ollama and pull Qwen3-VL during build
-RUN curl -fsSL https://ollama.com/install.sh | sh && \
+RUN apt-get update && \
+    for i in {1..5}; do apt-get install -y curl && break || sleep 5; done && \
+    curl -fsSL https://ollama.com/install.sh | sh && \
     (ollama serve & sleep 5 && ollama pull qwen3-vl:8b-instruct)
 
 # Install SAM 2 dependencies
@@ -20,7 +22,7 @@ RUN pip install --no-cache-dir \
     supervision==0.16.0
 
 # Clone SAM 2 repository
-RUN git clone https://github.com/facebookresearch/segment-anything-2.git /workspace/SAM2 && \
+RUN for i in {1..5}; do git clone https://github.com/facebookresearch/segment-anything-2.git /workspace/SAM2 && break || sleep 5; done && \
     cd /workspace/SAM2 && \
     pip install --no-cache-dir -e . && \
     pip install --no-cache-dir "numpy<2.0.0"

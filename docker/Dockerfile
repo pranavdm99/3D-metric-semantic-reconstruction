@@ -12,7 +12,8 @@ ENV PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
 ENV CUDA_VISIBLE_DEVICES=0
 
 # Install system dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    for i in {1..5}; do apt-get install -y \
     python3.10 \
     python3-pip \
     git \
@@ -25,8 +26,8 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     libgomp1 \
     ffmpeg \
-    vim \
-    && rm -rf /var/lib/apt/lists/*
+    vim && break || sleep 5; done && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create working directory
 WORKDIR /workspace
@@ -54,9 +55,11 @@ RUN pip3 install --no-cache-dir \
 RUN pip3 install --no-cache-dir nerfstudio
 
 # Clone and install SuGaR (Surface-Aligned Gaussian Splatting)
-RUN git clone https://github.com/Anttwo/SuGaR.git /workspace/SuGaR && \
-    cd /workspace/SuGaR && \
-    pip3 install --no-cache-dir -e .
+RUN for i in {1..5}; do git clone --recursive https://github.com/Anttwo/SuGaR.git /workspace/SuGaR && break || sleep 5; done && \
+    export TORCH_CUDA_ARCH_LIST="8.9" && \
+    pip3 install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodules/simple-knn && \
+    pip3 install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodules/diff-gaussian-rasterization
+ENV PYTHONPATH="/workspace/SuGaR/gaussian_splatting:${PYTHONPATH}"
 
 # Install COLMAP for structure-from-motion
 RUN apt-get update && apt-get install -y colmap
@@ -84,10 +87,17 @@ RUN pip3 install --no-cache-dir \
     scikit-image \
     open3d
 
-# Install CoACD (Convex Decomposition)
-RUN git clone https://github.com/SarahWeiii/CoACD.git /workspace/CoACD && \
-    cd /workspace/CoACD && \
-    pip3 install --no-cache-dir -e .
+# Install CoACD (Approximate Convex Decomposition)
+RUN set -eux; \
+    for i in {1..5}; do git clone --recursive https://github.com/SarahWeiii/CoACD.git /tmp/CoACD && break || sleep 5; done; \
+    cd /tmp/CoACD; \
+    mkdir build; cd build; \
+    if cmake .. -DCMAKE_BUILD_TYPE=Release && make -j"$(nproc)"; then \
+        cp CoACD /usr/local/bin/ 2>/dev/null || cp coacd /usr/local/bin/ 2>/dev/null || true; \
+    else \
+        echo "WARNING: CoACD build failed."; \
+    fi; \
+    cd /tmp; rm -rf /tmp/CoACD
 
 # ===== ASSEMBLY: MJCF Assembly =====
 FROM base AS assembly
@@ -127,21 +137,30 @@ RUN pip3 install --no-cache-dir nerfstudio && \
     pip3 install --no-cache-dir git+https://github.com/facebookresearch/segment-anything-2.git
 
 # Install SuGaR
-RUN git clone https://github.com/Anttwo/SuGaR.git /workspace/SuGaR && \
-    cd /workspace/SuGaR && \
-    pip3 install --no-cache-dir -e .
+RUN for i in {1..5}; do git clone --recursive https://github.com/Anttwo/SuGaR.git /workspace/SuGaR && break || sleep 5; done && \
+    export TORCH_CUDA_ARCH_LIST="8.9" && \
+    pip3 install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodules/simple-knn && \
+    pip3 install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodules/diff-gaussian-rasterization
 
 # Install CoACD
-RUN git clone https://github.com/SarahWeiii/CoACD.git /workspace/CoACD && \
-    cd /workspace/CoACD && \
-    pip3 install --no-cache-dir -e .
+RUN set -eux; \
+    for i in {1..5}; do git clone --recursive https://github.com/SarahWeiii/CoACD.git /tmp/CoACD && break || sleep 5; done; \
+    cd /tmp/CoACD; \
+    mkdir build; cd build; \
+    if cmake .. -DCMAKE_BUILD_TYPE=Release && make -j"$(nproc)"; then \
+        cp CoACD /usr/local/bin/ 2>/dev/null || cp coacd /usr/local/bin/ 2>/dev/null || true; \
+    else \
+        echo "WARNING: CoACD build failed."; \
+    fi; \
+    cd /tmp; rm -rf /tmp/CoACD
 
 # Install COLMAP
-RUN apt-get update && apt-get install -y colmap && \
+RUN apt-get update && \
+    for i in {1..5}; do apt-get install -y colmap && break || sleep 5; done && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy project code
-COPY . /workspace/project
+COPY . /workspace
 
 WORKDIR /workspace
 

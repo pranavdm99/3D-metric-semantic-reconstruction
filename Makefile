@@ -5,11 +5,15 @@ help:
 	@echo ""
 	@echo "Available targets:"
 	@echo "  build-base     - Build base Docker image"
-	@echo "  build-all      - Build all Stage Docker images"
-	@echo "  reconstruction - Run Stage 1: Neural Reconstruction"
-	@echo "  segmentation   - Run Stage 2: Semantic Segmentation"
-	@echo "  physics        - Run Stage 3: Automated Physics Extraction"
-	@echo "  assembly       - Run Stage 4: MJCF Assembly"
+	@echo "  build-reconstruction - Build Neural Reconstruction image"
+	@echo "  build-segmentation   - Build Semantic Segmentation image"
+	@echo "  build-physics        - Build Automated Physics Extraction image"
+	@echo "  build-assembly       - Build MJCF Assembly image"
+	@echo "  build-full           - Build Full environment image"
+	@echo "  reconstruction - Run Neural Reconstruction"
+	@echo "  segmentation   - Run Semantic Segmentation"
+	@echo "  physics        - Run Automated Physics Extraction"
+	@echo "  assembly       - Run MJCF Assembly"
 	@echo "  run-all        - Run all stages sequentially"
 	@echo "  test           - Test MuJoCo output"
 	@echo "  sim            - Launch MuJoCo interactive viewer (needs display)"
@@ -22,29 +26,47 @@ build-base:
 	@echo "Building base Docker image..."
 	docker compose --profile build build base
 
+build-reconstruction:
+	@echo "Building Reconstruction image..."
+	docker compose build reconstruction
+
+build-segmentation:
+	@echo "Building Segmentation image..."
+	docker compose build segmentation
+
+build-physics:
+	@echo "Building Physics image..."
+	docker compose build physics
+
+build-assembly:
+	@echo "Building Assembly image..."
+	docker compose build assembly
+
+build-full:
+	@echo "Building Full environment image..."
+	docker compose build full
+
 # Build all Stage images
-build-all: build-base
-	@echo "Building all Stage images..."
-	docker compose build
+build-all: build-base build-reconstruction build-segmentation build-physics build-assembly build-full
 
 run-all:
 	@echo "Running full pipeline..."
 	./run_all.sh
 
 reconstruction:
-	@echo "Running Stage 1: Neural Reconstruction..."
+	@echo "Running Neural Reconstruction..."
 	docker compose run --rm reconstruction bash /workspace/scripts/reconstruction.sh
 
 segmentation:
-	@echo "Running Stage 2: Semantic Segmentation..."
+	@echo "Running Semantic Segmentation..."
 	docker compose run --rm segmentation bash /workspace/scripts/segmentation.sh
 
 physics:
-	@echo "Running Stage 3: Automated Physics Extraction..."
+	@echo "Running Automated Physics Extraction..."
 	docker compose run --rm physics bash /workspace/scripts/physics.sh
 
 assembly:
-	@echo "Running Stage 4: MJCF Assembly..."
+	@echo "Running MJCF Assembly..."
 	docker compose run --rm assembly bash /workspace/scripts/assembly.sh
 
 test:

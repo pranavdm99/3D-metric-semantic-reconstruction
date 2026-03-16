@@ -2,9 +2,9 @@
 FROM physics-video-pipeline-base:latest
 
 # Install COLMAP for Structure from Motion
-RUN apt-get update && apt-get install -y \
-    colmap \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    for i in {1..5}; do apt-get install -y colmap && break || sleep 5; done && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install 3D Gaussian Splatting dependencies
 RUN pip install --no-cache-dir \
@@ -32,7 +32,7 @@ RUN pip install --no-cache-dir \
 RUN pip install --no-cache-dir pytorch3d -f https://dl.fbaipublicfiles.com/pytorch3d/packaging/wheels/py310_cu121_pyt210/download.html
 
 # Clone and setup SuGaR (Surface-Aligned Gaussian Reconstruction)
-RUN git clone --recursive https://github.com/Anttwo/SuGaR.git /workspace/SuGaR
+RUN for i in {1..5}; do git clone --recursive https://github.com/Anttwo/SuGaR.git /workspace/SuGaR && break || sleep 5; done
 
 # Install SuGaR's submodules
 ENV TORCH_CUDA_ARCH_LIST="8.9"
