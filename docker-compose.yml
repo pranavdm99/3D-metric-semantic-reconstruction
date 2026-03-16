@@ -20,9 +20,9 @@ services:
       - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
     volumes:
       - ./data:/workspace/data
-      - ./src/reconstruction:/workspace/reconstruction
+      - ./src:/workspace/src
       - ./configs:/workspace/configs
-      - ./scripts/reconstruction:/workspace/scripts
+      - ./scripts:/workspace/scripts
     shm_size: '4gb'
     deploy:
       resources:
@@ -45,9 +45,9 @@ services:
       - OLLAMA_MODELS=/workspace/data/checkpoints/ollama
     volumes:
       - ./data:/workspace/data
-      - ./src/segmentation:/workspace/segmentation
+      - ./src:/workspace/src
       - ./configs:/workspace/configs
-      - ./scripts/segmentation:/workspace/scripts
+      - ./scripts:/workspace/scripts
     shm_size: '4gb'
     ports:
       - "11434:11434"  # Ollama API
@@ -71,9 +71,9 @@ services:
       - CUDA_VISIBLE_DEVICES=0
     volumes:
       - ./data:/workspace/data
-      - ./src/physics:/workspace/physics
+      - ./src:/workspace/src
       - ./configs:/workspace/configs
-      - ./scripts/physics:/workspace/scripts
+      - ./scripts:/workspace/scripts
     shm_size: '2gb'
     deploy:
       resources:
@@ -96,10 +96,9 @@ services:
       - MUJOCO_GL=egl
     volumes:
       - ./data:/workspace/data
-      - ./src/assembly:/workspace/assembly
-      - ./src/utils:/workspace/utils
+      - ./src:/workspace/src
       - ./configs:/workspace/configs
-      - ./scripts/assembly:/workspace/scripts
+      - ./scripts:/workspace/scripts
     shm_size: '2gb'
     deploy:
       resources:

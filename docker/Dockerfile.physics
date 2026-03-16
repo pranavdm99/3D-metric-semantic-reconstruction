@@ -50,5 +50,6 @@ RUN pip install --no-cache-dir \
     scikit-learn==1.3.2
 
 WORKDIR /workspace
-COPY src/physics /workspace/physics
+COPY src /workspace/src
 COPY configs /workspace/configs
+COPY scripts /workspace/scripts

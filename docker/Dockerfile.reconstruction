@@ -40,8 +40,9 @@ RUN pip install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodu
     pip install --no-build-isolation /workspace/SuGaR/gaussian_splatting/submodules/diff-gaussian-rasterization
 
 WORKDIR /workspace
-COPY src/reconstruction /workspace/reconstruction
+COPY src /workspace/src
 COPY configs /workspace/configs
+COPY scripts /workspace/scripts
 
 # Memory-efficient training script
 ENV TCNN_CUDA_ARCHITECTURES=89

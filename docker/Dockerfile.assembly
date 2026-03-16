@@ -30,9 +30,9 @@ RUN pip install --no-cache-dir \
     pillow==10.0.1
 
 WORKDIR /workspace
-COPY src/assembly /workspace/assembly
-COPY src/utils /workspace/utils
+COPY src /workspace/src
 COPY configs /workspace/configs
+COPY scripts /workspace/scripts
 
 # Enable MuJoCo GPU rendering
 ENV MUJOCO_GL=egl

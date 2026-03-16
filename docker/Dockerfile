@@ -143,6 +143,6 @@ RUN apt-get update && apt-get install -y colmap && \
 # Copy project code
 COPY . /workspace/project
 
-WORKDIR /workspace/project
+WORKDIR /workspace
 
 CMD ["/bin/bash"]

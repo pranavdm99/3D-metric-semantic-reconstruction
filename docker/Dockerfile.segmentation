@@ -26,8 +26,9 @@ RUN git clone https://github.com/facebookresearch/segment-anything-2.git /worksp
     pip install --no-cache-dir "numpy<2.0.0"
 
 WORKDIR /workspace
-COPY src/segmentation /workspace/segmentation
+COPY src /workspace/src
 COPY configs /workspace/configs
+COPY scripts /workspace/scripts
 
 # Optimize for memory-constrained inference
 ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
