@@ -1,0 +1,38 @@
+# Assembly: MJCF Assembly & Simulation Bridge
+FROM physics-video-pipeline-base:latest
+
+# Install MuJoCo 3.x
+RUN cd /tmp && \
+    wget https://github.com/google-deepmind/mujoco/releases/download/3.1.0/mujoco-3.1.0-linux-x86_64.tar.gz && \
+    tar -xzf mujoco-3.1.0-linux-x86_64.tar.gz && \
+    mkdir -p /root/.mujoco && \
+    mv mujoco-3.1.0 /root/.mujoco/mujoco310 && \
+    rm mujoco-3.1.0-linux-x86_64.tar.gz
+
+ENV MUJOCO_DIR=/root/.mujoco/mujoco310
+ENV LD_LIBRARY_PATH=$MUJOCO_DIR/lib:$LD_LIBRARY_PATH
+
+# Install Python MuJoCo bindings
+RUN pip install --no-cache-dir mujoco==3.1.0
+
+# Install additional physics and rendering tools
+RUN pip install --no-cache-dir \
+    dm-control==1.0.14 \
+    lxml==4.9.3 \
+    xmltodict==0.13.0
+
+# Install gsplat for photorealistic rendering bridge
+RUN pip install --no-cache-dir gsplat==0.1.11
+
+# Install mesh processing for final assembly
+RUN pip install --no-cache-dir \
+    trimesh==4.0.5 \
+    pillow==10.0.1
+
+WORKDIR /workspace
+COPY src/assembly /workspace/assembly
+COPY src/utils /workspace/utils
+COPY configs /workspace/configs
+
+# Enable MuJoCo GPU rendering
+ENV MUJOCO_GL=egl

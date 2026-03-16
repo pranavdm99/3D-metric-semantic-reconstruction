@@ -1,0 +1,54 @@
+# Physics: Automated Physics Extraction (Poisson + CoACD)
+FROM physics-video-pipeline-base:latest
+
+# Install mesh processing libraries
+RUN apt-get update && apt-get install -y \
+    libeigen3-dev \
+    libboost-all-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python mesh processing tools
+RUN pip install --no-cache-dir \
+    trimesh==4.0.5 \
+    open3d==0.17.0 \
+    pymeshlab==2023.12 \
+    pyvista==0.42.3 \
+    meshio==5.3.4 \
+    plyfile \
+    cmake==3.27.9
+
+# Build and install CoACD (Approximate Convex Decomposition)
+# CoACD upstream can occasionally break due to dependency/toolchain changes.
+# Keep image build resilient and fall back to V-HACD at runtime if CoACD fails.
+RUN set -eux; \
+        git clone --recursive https://github.com/SarahWeiii/CoACD.git /tmp/CoACD; \
+        cd /tmp/CoACD; \
+        mkdir build; \
+        cd build; \
+        if cmake .. -DCMAKE_BUILD_TYPE=Release && make -j"$(nproc)"; then \
+            cp CoACD /usr/local/bin/ 2>/dev/null || cp coacd /usr/local/bin/ 2>/dev/null || true; \
+            chmod +x /usr/local/bin/CoACD 2>/dev/null || true; \
+            chmod +x /usr/local/bin/coacd 2>/dev/null || true; \
+        else \
+            echo "WARNING: CoACD build failed. V-HACD fallback will be used."; \
+        fi; \
+        cd /tmp; \
+        rm -rf /tmp/CoACD
+
+# Install V-HACD as fallback
+RUN git clone https://github.com/kmammou/v-hacd.git /tmp/v-hacd && \
+    cd /tmp/v-hacd/app && \
+    mkdir build && cd build && \
+    cmake .. && \
+    make -j$(nproc) && \
+    cp TestVHACD /usr/local/bin/vhacd && \
+    cd /tmp && rm -rf v-hacd
+
+# Install point cloud and mesh utilities
+RUN pip install --no-cache-dir \
+    pyransac3d==0.6.0 \
+    scikit-learn==1.3.2
+
+WORKDIR /workspace
+COPY src/physics /workspace/physics
+COPY configs /workspace/configs

@@ -1,0 +1,33 @@
+# Segmentation: Semantic Grounding & 3D Segmentation (Qwen3-VL + SAM2)
+FROM physics-video-pipeline-base:latest
+
+# Install Ollama and pull Qwen3-VL during build
+RUN curl -fsSL https://ollama.com/install.sh | sh && \
+    (ollama serve & sleep 5 && ollama pull qwen3-vl:8b-instruct)
+
+# Install SAM 2 dependencies
+RUN pip install --no-cache-dir \
+    "numpy<2.0.0" \
+    transformers==4.35.0 \
+    accelerate==0.24.1 \
+    einops==0.7.0 \
+    requests==2.31.0 \
+    plyfile==0.8.1
+
+# Install additional vision dependencies
+RUN pip install --no-cache-dir \
+    timm==0.9.12 \
+    supervision==0.16.0
+
+# Clone SAM 2 repository
+RUN git clone https://github.com/facebookresearch/segment-anything-2.git /workspace/SAM2 && \
+    cd /workspace/SAM2 && \
+    pip install --no-cache-dir -e . && \
+    pip install --no-cache-dir "numpy<2.0.0"
+
+WORKDIR /workspace
+COPY src/segmentation /workspace/segmentation
+COPY configs /workspace/configs
+
+# Optimize for memory-constrained inference
+ENV PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
