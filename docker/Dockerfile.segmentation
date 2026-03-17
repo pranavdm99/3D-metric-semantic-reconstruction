@@ -19,7 +19,8 @@ RUN pip install --no-cache-dir \
 # Install additional vision dependencies
 RUN pip install --no-cache-dir \
     timm==0.9.12 \
-    supervision==0.16.0
+    supervision==0.16.0 \
+    ultralytics
 
 # Clone SAM 2 repository
 RUN for i in {1..5}; do git clone https://github.com/facebookresearch/segment-anything-2.git /workspace/SAM2 && break || sleep 5; done && \
