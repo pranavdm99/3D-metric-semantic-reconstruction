@@ -29,7 +29,7 @@ RUN apt-get update && \
     ffmpeg \
     libavcodec-dev \
     libavformat-dev \
-    libswscale-dev && break || sleep 5; done && \
+    libswscale-dev && break || if [ $i -eq 5 ]; then exit 1; else sleep 5; fi; done && \
     rm -rf /var/lib/apt/lists/*
 
 # Set Python 3.10 as default
