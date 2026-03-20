@@ -1,5 +1,5 @@
 # Reconstruction: Neural Reconstruction & Surface Alignment (SuGaR + 3DGS)
-FROM physics-video-pipeline-base:latest
+FROM semantic-scene-base:latest
 
 # Install COLMAP for Structure from Motion
 RUN apt-get update && \

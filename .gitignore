@@ -1,4 +1,4 @@
-# .gitignore for Physics-Ready Video Pipeline
+# .gitignore for Semantic Scene Reconstruction Pipeline
 
 # Data directories
 data/raw_video/*.mp4

@@ -272,7 +272,7 @@ class ReconstructionPipeline:
         return sugar_dir
 
     def export_pt_to_ply(self, pt_path: Path, ply_path: Path):
-        """Export SuGaR .pt checkpoint to a high-fidelity .ply file for Segmentation/Physics"""
+        """Export SuGaR .pt checkpoint to a high-fidelity .ply file for Segmentation"""
         print(f"Exporting {pt_path.name} to {ply_path.name}...")
         
         checkpoint = torch.load(pt_path, map_location='cpu')

@@ -101,7 +101,7 @@ class YOLOWorldDetector:
         except Exception:
             pass
 
-        print(f"🚀 Initializing YOLO World with {model_id}...")
+        print(f"Initializing YOLO World with {model_id}...")
         self.model = YOLOWorld(model_id)
         # Explicitly move to device to avoid DeviceMismatch later
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -165,7 +165,7 @@ class SAM2Segmenter:
         Segment objects and track across frames using multi-indexed prompts.
         Processed in batches to manage VRAM.
         """
-        print(f"🎭 Running SAM 2 segmentation and tracking (Batch Size: {batch_size})...")
+        print(f"Running SAM 2 segmentation and tracking (Batch Size: {batch_size})...")
         output_dir.mkdir(parents=True, exist_ok=True)
         
         frames = sorted(video_dir.glob('*.jpg'))
@@ -186,7 +186,7 @@ class SAM2Segmenter:
         # Process in batches
         for batch_idx in range(0, len(prompts), batch_size):
             batch_prompts = prompts[batch_idx : batch_idx + batch_size]
-            print(f"\n📦 Processing batch {batch_idx//batch_size + 1}/{(len(prompts)-1)//batch_size + 1} ({len(batch_prompts)} objects)...")
+            print(f"\n Processing batch {batch_idx//batch_size + 1}/{(len(prompts)-1)//batch_size + 1} ({len(batch_prompts)} objects)...")
             
             inference_state = self.predictor.init_state(video_path=str(tmp_frames_dir))
             batch_object_names = []
@@ -231,7 +231,7 @@ class SAM2Segmenter:
                     m = masks[i] if masks[i] is not None else np.zeros((h, w), dtype=bool)
                     cv2.imwrite(str(obj_dir / f"mask_{i:04d}.png"), (m * 255).astype(np.uint8))
                 all_object_masks[name] = masks
-                print(f"  ✅ Saved masks for {name}")
+                print(f"  Saved masks for {name}")
             
             # CRITICAL: Clean up memory before next batch
             self.predictor.reset_state(inference_state)
@@ -273,19 +273,19 @@ class SegmentationPipeline:
         frames = sorted(self.frames_dir.glob('*.jpg'))
         index = int(len(frames) * fraction)
         keyframe = frames[index]
-        print(f"🖼️  Selected keyframe: {keyframe.name} (at {fraction*100:.0f}% of video, index {index})")
+        print(f"Selected keyframe: {keyframe.name} (at {fraction*100:.0f}% of video, index {index})")
         return keyframe, index
     
     def lift_masks_to_3d(self, object_masks: Dict[str, np.ndarray], splat_path: Path):
         """Map 2D masks back to 3D Gaussians using camera projection voting"""
-        print("🎯 Lifting 2D masks to 3D Gaussian groups using camera projection...")
+        print("Lifting 2D masks to 3D Gaussian groups using camera projection...")
         
         from plyfile import PlyData, PlyElement
         
         # 1. Load COLMAP camera data
         colmap_root = self.data_root / 'outputs' / 'colmap' / 'sparse' / '0'
         if not (colmap_root / 'cameras.txt').exists():
-            print("  ⚠️  COLMAP data not found. Falling back to axis partition.")
+            print("COLMAP data not found. Falling back to axis partition.")
             return self._lift_masks_fallback(object_masks, splat_path)
             
         cameras = ColmapParser.read_cameras(colmap_root / 'cameras.txt')
@@ -300,7 +300,7 @@ class SegmentationPipeline:
         # 3. Initialize voting matrix [n_gaussians, n_objects]
         object_names = list(object_masks.keys())
         if not object_names:
-             print("  ⚠️  No objects detected to lift.")
+             print("  No objects detected to lift.")
              return {}
              
         n_objects = len(object_names)
@@ -345,7 +345,7 @@ class SegmentationPipeline:
             
             # Diagnostic for Frame 0 only
             if f_idx == masked_frames[0]:
-                print(f"    🔍 Diagnostic (Frame {f_idx}):")
+                print(f"    Diagnostic (Frame {f_idx}):")
                 print(f"       - K matrix: \n{K}")
                 print(f"       - Splat XYZ range: {np.min(xyz, axis=0)} to {np.max(xyz, axis=0)}")
                 print(f"       - Depth range in camera: {np.min(xyz_cam[:, 2]):.2f} to {np.max(xyz_cam[:, 2]):.2f}")
@@ -417,7 +417,7 @@ class SegmentationPipeline:
                 overlap_ratio = len(intersection) / len(set_b) if len(set_b) > 0 else 0
                 
                 if iou_3d > 0.5 or overlap_ratio > 0.8:
-                    print(f"     🔗 Merging '{name_b}' into '{name_a}' (3D IoU: {iou_3d:.2f}, Overlap: {overlap_ratio:.2f})")
+                    print(f"     Merging '{name_b}' into '{name_a}' (3D IoU: {iou_3d:.2f}, Overlap: {overlap_ratio:.2f})")
                     master_set = union
                     merged_names.append(name_b)
                     processed_names.add(name_b)
@@ -443,7 +443,7 @@ class SegmentationPipeline:
         with open(self.output_dir / 'segmentation_metadata.json', 'w') as f:
             json.dump(mask_metadata, f, indent=2)
         
-        print(f"  ✅ Mask metadata saved")
+        print(f" Mask metadata saved")
         return mask_metadata
 
     def _lift_masks_fallback(self, object_masks: Dict[str, np.ndarray], splat_path: Path):
@@ -487,10 +487,10 @@ class SegmentationPipeline:
         
         # Get target objects from config
         target_objects = self.config.get('target_objects', ['chair', 'table', 'mug'])
-        print(f"🎯 Target objects: {target_objects}")
+        print(f"Target objects: {target_objects}")
         
         # Step 1: YOLO World Multi-Anchor Discovery
-        print("\n📍 Step 1: Multi-anchor object discovery")
+        print("\nStep 1: Multi-anchor object discovery")
         all_prompts = [] # List of (class, bbox, frame_idx)
         try:
             detector = YOLOWorldDetector()
@@ -513,7 +513,7 @@ class SegmentationPipeline:
             torch.cuda.empty_cache()
             
             # Step 1.2: Deduplicate class_detections per frame (IoU > 0.8)
-            print(f"  → Deduplicating overlapping detections (2D IoU > 0.8)...")
+            print(f"  Deduplicating overlapping detections (2D IoU > 0.8)...")
             final_prompt_detections = []
             for f_idx in sorted(class_detections_by_frame.keys()):
                 frame_dets = class_detections_by_frame[f_idx]
@@ -538,10 +538,10 @@ class SegmentationPipeline:
                     max_inst = max(max_inst, c_count)
                 
                 if max_inst == 0:
-                    print(f"  ⚠️  '{obj_class}' not detected in any anchor frame.")
+                    print(f"  '{obj_class}' not detected in any anchor frame.")
                     continue
                     
-                print(f"  → Found up to {max_inst} instances of '{obj_class}'")
+                print(f"  Found up to {max_inst} instances of '{obj_class}'")
                 for i in range(max_inst):
                     # Find earliest frame that has at least i+1 of this class
                     found = False
@@ -553,11 +553,11 @@ class SegmentationPipeline:
                             break
             
             if not all_prompts:
-                print("❌ ERROR: No objects detected in any anchor! Check input video.")
+                print("ERROR: No objects detected in any anchor! Check input video.")
                 print("  → Pipeline will attempt fallback but results will be poor.")
             
             # Step 2: SAM 2 temporal masking
-            print("\n🎭 Step 2: SAM 2 temporal segmentation")
+            print("\nStep 2: SAM 2 temporal segmentation")
             sam_checkpoint = Path('/workspace/checkpoints/sam2_hiera_small.pt')
             segmenter = SAM2Segmenter(sam_checkpoint)
             
@@ -568,8 +568,8 @@ class SegmentationPipeline:
             )
                     
         except (RuntimeError, Exception) as err:
-            print(f"  ⚠️  Segmentation Detection Pipeline Error: {err}")
-            print("  → Using fallback: empty object assignment")
+            print(f"  Segmentation Detection Pipeline Error: {err}")
+            print("  Using fallback: empty object assignment")
             object_masks = {obj: [] for obj in target_objects}
             for obj_dir in [self.output_dir / obj for obj in target_objects]:
                 obj_dir.mkdir(parents=True, exist_ok=True)
@@ -585,12 +585,11 @@ class SegmentationPipeline:
         mask_metadata = self.lift_masks_to_3d(object_masks, splat_path)
         
         print("\n" + "=" * 60)
-        print("✅ SEGMENTATION COMPLETE!")
+        print("SEGMENTATION COMPLETE!")
         print("=" * 60)
-        print(f"📦 Masks saved to: {self.output_dir}")
-        print(f"📊 Metadata: {self.output_dir / 'segmentation_metadata.json'}")
-        print(f"🎯 Detected objects: {len(object_masks)}")
-        print("\n➡️  Next: Run physics extraction for material estimation")
+        print(f"Masks saved to: {self.output_dir}")
+        print(f"Metadata: {self.output_dir / 'segmentation_metadata.json'}")
+        print(f"Detected objects: {len(object_masks)}")
 
 
 def main():

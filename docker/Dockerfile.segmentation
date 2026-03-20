@@ -1,5 +1,5 @@
 # Segmentation: Semantic Grounding & 3D Segmentation (Qwen3-VL + SAM2)
-FROM physics-video-pipeline-base:latest
+FROM semantic-scene-base:latest
 
 # Install Ollama and pull Qwen3-VL during build
 RUN apt-get update && \

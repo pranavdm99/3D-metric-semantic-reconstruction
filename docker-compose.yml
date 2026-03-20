@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.base
-    image: physics-video-pipeline-base:latest
+    image: semantic-scene-base:latest
     profiles: ["build"]
 
   # Reconstruction: Neural Reconstruction & Surface Alignment
@@ -12,7 +12,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.reconstruction
-    image: physics-video-pipeline-reconstruction:latest
+    image: semantic-scene-reconstruction-reconstruction:latest
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
@@ -37,7 +37,7 @@ services:
     build:
       context: .
       dockerfile: docker/Dockerfile.segmentation
-    image: physics-video-pipeline-segmentation:latest
+    image: semantic-scene-reconstruction-segmentation:latest
     runtime: nvidia
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
@@ -51,84 +51,6 @@ services:
     shm_size: '4gb'
     ports:
       - "11434:11434"  # Ollama API
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  # Physics: Automated Physics Extraction
-  physics:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.physics
-    image: physics-video-pipeline-physics:latest
-    runtime: nvidia
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=0
-      - CUDA_VISIBLE_DEVICES=0
-    volumes:
-      - ./data:/workspace/data
-      - ./src:/workspace/src
-      - ./configs:/workspace/configs
-      - ./scripts:/workspace/scripts
-    shm_size: '2gb'
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  # Assembly: MJCF Assembly & Simulation
-  assembly:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.assembly
-    image: physics-video-pipeline-assembly:latest
-    runtime: nvidia
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=0
-      - CUDA_VISIBLE_DEVICES=0
-      - MUJOCO_GL=egl
-    volumes:
-      - ./data:/workspace/data
-      - ./src:/workspace/src
-      - ./configs:/workspace/configs
-      - ./scripts:/workspace/scripts
-    shm_size: '2gb'
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-
-  # Full environment (for testing or running all stages combined)
-  full:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-      target: full
-    image: physics-video-pipeline-full:latest
-    container_name: physics-pipeline-full
-    runtime: nvidia
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=0
-      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512
-    volumes:
-      - ./data:/workspace/data
-      - ./src:/workspace/src
-      - ./configs:/workspace/configs
-      - ./scripts:/workspace/scripts
-    working_dir: /workspace
-    command: /bin/bash
-    stdin_open: true
-    tty: true
     deploy:
       resources:
         reservations:
