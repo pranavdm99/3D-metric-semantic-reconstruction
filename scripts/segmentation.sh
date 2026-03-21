@@ -3,12 +3,6 @@
 
 set -e
 
-cleanup() {
-    kill "$OLLAMA_PID" 2>/dev/null || true
-}
-
-trap cleanup EXIT
-
 echo "🚀 Starting Segmentation: Semantic Grounding & 3D Segmentation"
 echo "========================================================"
 
@@ -17,12 +11,6 @@ if [ ! -f "/workspace/data/outputs/splats/reconstruction_metadata.json" ]; then
     echo "❌ Error: Reconstruction output not found. Run Reconstruction first!"
     exit 1
 fi
-
-# Start Ollama service in background
-echo "🤖 Starting Ollama service..."
-ollama serve &
-OLLAMA_PID=$!
-sleep 5
 
 # Check GPU
 nvidia-smi || { echo "❌ Error: NVIDIA GPU not found"; exit 1; }

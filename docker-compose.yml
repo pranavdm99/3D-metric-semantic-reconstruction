@@ -42,15 +42,12 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=0
       - CUDA_VISIBLE_DEVICES=0
-      - OLLAMA_MODELS=/workspace/data/checkpoints/ollama
     volumes:
       - ./data:/workspace/data
       - ./src:/workspace/src
       - ./configs:/workspace/configs
       - ./scripts:/workspace/scripts
     shm_size: '4gb'
-    ports:
-      - "11434:11434"  # Ollama API
     deploy:
       resources:
         reservations:

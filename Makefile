@@ -45,9 +45,8 @@ check-gpu:
 
 clean-outputs:
 	@echo "Cleaning outputs..."
-	rm -rf data/outputs/splats/* data/outputs/masks/*
-	rm -rf data/raw_video/frames
-	@echo "✅ Outputs cleaned (raw video preserved)"
+	rm -rf data/outputs/splats/* data/outputs/masks/* data/outputs/colmap/* data/raw_video/frames
+	@echo "✅ Outputs cleaned"
 
 clean: clean-outputs
 	@echo "Removing Docker images..."

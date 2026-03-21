@@ -1,13 +1,11 @@
 # .gitignore for Semantic Scene Reconstruction Pipeline
 
 # Data directories
-data/raw_video/*.mp4
-data/raw_video/*.mov
-data/raw_video/*.avi
-data/raw_video/frames/
+!data/raw_video/.gitkeep
+data/raw_video/
+data/input/
 data/outputs/
 data/checkpoints/
-!data/checkpoints/.gitkeep
 
 # Python
 __pycache__/

@@ -1,0 +1,65 @@
+{
+  "project_name": "Physics-Ready Video Pipeline",
+  "description": "End-to-end pipeline for converting real-world video into photorealistic physics simulation assets",
+  "reconstruction": {
+    "name": "Neural Reconstruction & Surface Alignment",
+    "data_root": "data",
+    "input_video": "data/input/room_2603191905/2026_03_19_1905566120.mp4",
+    "extraction_fps": 5,
+    "extraction_downscale": 2,
+    "align_ar_scale": true,
+    "ar_data_path": "data/input/room_2603191905",
+    "iterations_3dgs": 7000,
+    "colmap_settings": {
+      "max_image_size": 1024,
+      "max_features": 4096
+    },
+    "sugar_settings": {
+      "iterations_sugar": 5000,
+      "n_gaussians_per_surface": 10,
+      "surface_mesh_density": 0.5,
+      "regularization_weight": 0.01,
+      "n_samples_for_sdf_regularization": 100000,
+      "downscale_resolution_factor": 4
+    },
+    "force_redo": false,
+    "notes": "Optimized for 8GB GPU - adjust iterations and image size if needed"
+  },
+  "segmentation": {
+    "name": "Semantic Grounding & 3D Segmentation",
+    "data_root": "data",
+    "target_objects": [
+      "workdesk",
+      "bed",
+      "fabric wardrobe",
+      "monitor",
+      "dresser"
+    ],
+    "vlm_model": "qwen3-vl:8b-instruct",
+    "sam2_model": "sam2_hiera_small",
+    "confidence_threshold": 0.5,
+    "notes": [
+      "Qwen3-VL unloads from VRAM after inference using --keepalive 0",
+      "SAM2 processes video frames in batches to manage memory"
+    ]
+  },
+  "gpu_optimizations": {
+    "max_vram_gb": 7.5,
+    "pytorch_allocator": "max_split_size_mb:64",
+    "gradient_checkpointing": true,
+    "mixed_precision": true,
+    "batch_processing": true,
+    "notes": [
+      "Designed for NVIDIA RTX 4060 (8GB VRAM)",
+      "Each stage clears VRAM before proceeding",
+      "Never hold splats + masks + meshes simultaneously"
+    ]
+  },
+  "output_structure": {
+    "splats": "data/outputs/splats/",
+    "masks": "data/outputs/masks/",
+    "meshes": "data/outputs/meshes/",
+    "mjcf": "data/outputs/mjcf/",
+    "checkpoints": "data/checkpoints/"
+  }
+}

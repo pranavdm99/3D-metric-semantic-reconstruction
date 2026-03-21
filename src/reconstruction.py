@@ -36,9 +36,14 @@ class ReconstructionPipeline:
         
         # Extract at configurable FPS to reduce memory footprint
         fps = self.config.get('extraction_fps', 2)
+        downscale = self.config.get('extraction_downscale', 1)
+        vf_args = f'fps={fps}'
+        if downscale > 1:
+            vf_args += f',scale=iw/{downscale}:ih/{downscale}'
+
         cmd = [
-            'ffmpeg', '-i', str(self.video_path),
-            '-vf', f'fps={fps}',
+            'ffmpeg', '-y', '-i', str(self.video_path),
+            '-vf', vf_args,
             '-qscale:v', '2',
             str(frames_dir / 'frame_%04d.jpg')
         ]
@@ -115,12 +120,49 @@ class ReconstructionPipeline:
             '--Mapper.ba_global_max_num_iterations', '20'  # Reduce iterations
         ], check=True, env=colmap_env)
         
+        # Merge fragmented sub-models if they exist
+        submodels = sorted([d.name for d in sparse_dir.iterdir() if d.is_dir() and d.name.isdigit()], key=int)
+        if len(submodels) > 1:
+            print(f"COLMAP fragmented into {len(submodels)} submodels. Attempting to merge them into '0'...")
+            for i in range(1, len(submodels)):
+                print(f"Merging submodel {submodels[i]} into 0...")
+                subprocess.run([
+                    'colmap', 'model_merger',
+                    '--input_path1', str(sparse_dir / '0'),
+                    '--input_path2', str(sparse_dir / submodels[i]),
+                    '--output_path', str(sparse_dir / '0')
+                ], check=False, env=colmap_env)
+        
         # Verify reconstruction success
         if not (sparse_dir / '0').exists():
             print("COLMAP Error: No sparse model (sparse/0) was created.")
             print("This usually means SfM failed to find enough matches or a good initial pair.")
             print("Check your input video quality and coverage.")
             raise RuntimeError("COLMAP failed to create a reconstruction model.")
+
+        # --- AR ALIGNMENT STEP ---
+        align_ar_scale = self.config.get('align_ar_scale', False)
+        ar_data_path = self.config.get('ar_data_path', None)
+        if align_ar_scale and ar_data_path:
+            print("Aligning COLMAP model to ARKit metric scale...")
+            ref_path = colmap_dir / 'ref_images.txt'
+            subprocess.run([
+                'python', '/workspace/src/utils/align_trajectory.py',
+                '--ar_data', str(Path('/workspace') / ar_data_path),
+                '--fps', str(self.config.get('extraction_fps', 2)),
+                '--output', str(ref_path)
+            ], check=True)
+            
+            subprocess.run([
+                'colmap', 'model_aligner',
+                '--input_path', str(sparse_dir / '0'),
+                '--output_path', str(sparse_dir / '0'),
+                '--ref_images_path', str(ref_path),
+                '--ref_is_gps', '0',
+                '--robust_alignment', '1',
+                '--robust_alignment_max_error', '3.0'
+            ], check=True, env=colmap_env)
+            print("AR metric alignment complete.")
 
         # Convert to text format for easier processing
         subprocess.run([
@@ -233,6 +275,7 @@ class ReconstructionPipeline:
             '-s', str(colmap_dir),
             '-m', str(vanilla_dir),
             '--iterations', str(sugar_config['iterations']),
+            '-r', '2',
             '--quiet'
         ]
         subprocess.run(cmd_vanilla, check=True)
@@ -272,73 +315,78 @@ class ReconstructionPipeline:
         return sugar_dir
 
     def export_pt_to_ply(self, pt_path: Path, ply_path: Path):
-        """Export SuGaR .pt checkpoint to a high-fidelity .ply file for Segmentation"""
+        """Export SuGaR .pt checkpoint to a standard 3DGS .ply file for Web Viewers"""
         print(f"Exporting {pt_path.name} to {ply_path.name}...")
         
         checkpoint = torch.load(pt_path, map_location='cpu')
         state_dict = checkpoint.get('state_dict', checkpoint)
         
-        # Extract parameters
         xyz = state_dict.get('_points', None)
         if xyz is None:
             xyz = next((v for k, v in state_dict.items() if k.endswith('_points')), None)
-        
         if xyz is None:
             raise ValueError(f"Could not find points in {pt_path}")
 
         n_points = xyz.shape[0]
         
-        # 1. Colors from SH
-        sh = state_dict.get('_sh_coordinates_dc', None)
-        if sh is not None:
-            if sh.ndim == 3:
-                sh = sh[:, 0, :]
-            C0 = 1 / (2 * np.sqrt(np.pi))
-            colors = (sh * C0 + 0.5).clamp(0, 1) * 255
+        normals = np.zeros((n_points, 3), dtype=np.float32)
+        
+        sh_dc = state_dict.get('_sh_coordinates_dc', None)
+        if sh_dc is not None:
+            if sh_dc.ndim == 3:
+                sh_dc = sh_dc[:, 0, :]
         else:
-            colors = torch.ones((n_points, 3)) * 200
+            sh_dc = torch.zeros((n_points, 3))
+            
+        sh_rest = state_dict.get('_sh_coordinates_rest', None)
+        if sh_rest is not None:
+            sh_rest = sh_rest.reshape(n_points, -1)
+        else:
+            sh_rest = torch.zeros((n_points, 45))
 
-        # 2. Opacity
-        opacity_raw = state_dict.get('all_densities', None)
-        opacity = torch.sigmoid(opacity_raw) if opacity_raw is not None else torch.ones((n_points, 1)) * 0.9
+        opacity = state_dict.get('all_densities', None)
+        if opacity is None:
+            opacity = torch.zeros((n_points, 1))
 
-        # 3. Scales
         scales = state_dict.get('_scales', None)
         if scales is None:
-            scales = torch.ones((n_points, 3)) * -2.0
+            scales = torch.zeros((n_points, 3))
         
-        # 4. Rotations
         quats = state_dict.get('_quaternions', None)
         if quats is None:
             quats = torch.zeros((n_points, 4))
             quats[:, 0] = 1.0
 
-        xyz_np = xyz.detach().cpu().numpy()
-        colors_np = colors.detach().cpu().numpy().astype(np.uint8)
-        opacity_np = opacity.detach().cpu().numpy()
-        scales_np = scales.detach().cpu().numpy()
-        quats_np = quats.detach().cpu().numpy()
+        xyz_np = xyz.detach().cpu().numpy().astype(np.float32)
+        sh_dc_np = sh_dc.detach().cpu().numpy().astype(np.float32)
+        sh_rest_np = sh_rest.detach().cpu().numpy().astype(np.float32)
+        opacity_np = opacity.detach().cpu().numpy().astype(np.float32)
+        scales_np = scales.detach().cpu().numpy().astype(np.float32)
+        quats_np = quats.detach().cpu().numpy().astype(np.float32)
 
-        vertex_data = [
-            (xyz_np[i, 0], xyz_np[i, 1], xyz_np[i, 2],
-                opacity_np[i, 0],
-                colors_np[i, 0], colors_np[i, 1], colors_np[i, 2],
-                scales_np[i, 0], scales_np[i, 1], scales_np[i, 2],
-                quats_np[i, 0], quats_np[i, 1], quats_np[i, 2], quats_np[i, 3])
-            for i in range(n_points)
-        ]
+        dtype = [('x', 'f4'), ('y', 'f4'), ('z', 'f4'), ('nx', 'f4'), ('ny', 'f4'), ('nz', 'f4')]
+        for i in range(3): dtype.append((f'f_dc_{i}', 'f4'))
+        for i in range(sh_rest_np.shape[1]): dtype.append((f'f_rest_{i}', 'f4'))
+        dtype.append(('opacity', 'f4'))
+        for i in range(3): dtype.append((f'scale_{i}', 'f4'))
+        for i in range(4): dtype.append((f'rot_{i}', 'f4'))
 
-        vertex_format = [
-            ('x', 'f4'), ('y', 'f4'), ('z', 'f4'),
-            ('opacity', 'f4'),
-            ('red', 'u1'), ('green', 'u1'), ('blue', 'u1'),
-            ('scale_0', 'f4'), ('scale_1', 'f4'), ('scale_2', 'f4'),
-            ('rot_0', 'f4'), ('rot_1', 'f4'), ('rot_2', 'f4'), ('rot_3', 'f4')
-        ]
-        
-        el = PlyElement.describe(np.array(vertex_data, dtype=vertex_format), 'vertex')
+        attributes = np.empty(n_points, dtype=dtype)
+        attributes['x'] = xyz_np[:, 0]
+        attributes['y'] = xyz_np[:, 1]
+        attributes['z'] = xyz_np[:, 2]
+        attributes['nx'] = normals[:, 0]
+        attributes['ny'] = normals[:, 1]
+        attributes['nz'] = normals[:, 2]
+        for i in range(3): attributes[f'f_dc_{i}'] = sh_dc_np[:, i]
+        for i in range(sh_rest_np.shape[1]): attributes[f'f_rest_{i}'] = sh_rest_np[:, i]
+        attributes['opacity'] = opacity_np[:, 0]
+        for i in range(3): attributes[f'scale_{i}'] = scales_np[:, i]
+        for i in range(4): attributes[f'rot_{i}'] = quats_np[:, i]
+
+        el = PlyElement.describe(attributes, 'vertex')
         PlyData([el]).write(str(ply_path))
-        print(f"High-fidelity export saved to {ply_path}")
+        print(f"Standard 3DGS export saved to {ply_path}")
 
     def validate_output(self, model_path: Path):
         """Validate the 3DGS output quality"""
