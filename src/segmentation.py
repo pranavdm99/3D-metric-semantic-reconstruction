@@ -407,9 +407,12 @@ class SegmentationPipeline:
             merged_names = [name_a]
             processed_names.add(name_a)
             
+            base_class_a = name_a.rsplit('_', 1)[0]
+            
             for name_b in sorted_names:
                 if name_b in processed_names: continue
                 set_b = obj_indices[name_b]
+                base_class_b = name_b.rsplit('_', 1)[0]
                 
                 # Intersection over Union for 3D sets
                 intersection = master_set.intersection(set_b)
@@ -419,8 +422,33 @@ class SegmentationPipeline:
                 # Also check if B is largely contained within A
                 overlap_ratio = len(intersection) / len(set_b) if len(set_b) > 0 else 0
                 
-                if iou_3d > 0.5 or overlap_ratio > 0.8:
-                    print(f"     Merging '{name_b}' into '{name_a}' (3D IoU: {iou_3d:.2f}, Overlap: {overlap_ratio:.2f})")
+                should_merge = (iou_3d > 0.5 or overlap_ratio > 0.8)
+                
+                # Semantic Loop Closure (Proximity merging for same class)
+                if not should_merge and base_class_a == base_class_b:
+                    pts_a = xyz[list(master_set)]
+                    pts_b = xyz[list(set_b)]
+                    
+                    if len(pts_a) > 0 and len(pts_b) > 0:
+                        min_a, max_a = np.min(pts_a, axis=0), np.max(pts_a, axis=0)
+                        min_b, max_b = np.min(pts_b, axis=0), np.max(pts_b, axis=0)
+                        
+                        dist_sq = 0.0
+                        for i in range(3):
+                            if max_a[i] < min_b[i]:
+                                dist_sq += (min_b[i] - max_a[i])**2
+                            elif max_b[i] < min_a[i]:
+                                dist_sq += (min_a[i] - max_b[i])**2
+                        dist = np.sqrt(dist_sq)
+                        
+                        if dist < 0.3: # 30 cm threshold
+                            should_merge = True
+                            print(f"     Semantic Loop Closure: '{name_b}' into '{name_a}' (Gap: {dist:.2f}m)")
+                
+                if should_merge:
+                    if iou_3d > 0.5 or overlap_ratio > 0.8:
+                        print(f"     Merging '{name_b}' into '{name_a}' (3D IoU: {iou_3d:.2f}, Overlap: {overlap_ratio:.2f})")
+                        
                     master_set = union
                     merged_names.append(name_b)
                     processed_names.add(name_b)
@@ -597,6 +625,12 @@ class SegmentationPipeline:
         print("\nStep 5: Generating 3D Metric Scene Graph")
         subprocess.run([
             'python', '/workspace/src/utils/generate_scene_graph.py'
+        ], check=False)
+
+        # Step 6: Network Graph Generation
+        print("\nStep 6: Generating Semantic Network Topological Graph")
+        subprocess.run([
+            'python', '/workspace/src/utils/visualize_network_graph.py'
         ], check=False)
         
         print("\n" + "=" * 60)

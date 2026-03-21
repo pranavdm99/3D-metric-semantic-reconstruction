@@ -50,14 +50,8 @@ def query_scene(query_text="What is resting on the workdesk?", model="qwen3-vl:8
     print(f"🤖 Sending query: '{query_text}'")
     
     try:
-        # Assumes Ollama is running on localhost exposing the inference API
-        # Or host.docker.internal if running from inside Docker container
-        host = "host.docker.internal"
-        try:
-            requests.get(f"http://{host}:11434/", timeout=1)
-        except requests.exceptions.RequestException:
-            host = "localhost" # Fallback
-            
+        # Assumes Ollama is running on localhost exposing the inference API            
+        host = "localhost" 
         ollama_url = f"http://{host}:11434/api/chat"
         payload = {
             "model": model,
