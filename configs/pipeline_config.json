@@ -1,6 +1,6 @@
 {
   "project_name": "Scene Reconstruction",
-  "description": "End-to-end pipeline for converting real-world video into photorealistic physics simulation assets",
+  "description": "3D reconstruction and closed loop metric-semantic segmentation of objects in the scene.",
   "reconstruction": {
     "name": "Neural Reconstruction & Surface Alignment",
     "data_root": "data",
