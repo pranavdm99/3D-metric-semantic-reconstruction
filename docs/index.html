@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Metric-Semantic Scene Reconstruction</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@600;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="hero">
+        <div class="glass-nav">
+            <h2 class="logo">Scene Recon<span style="color:var(--accent1)">.</span></h2>
+            <a href="https://github.com/pranavdm99/3D-metric-semantic-reconstruction" class="github-btn"
+                target="_blank">View on GitHub</a>
+        </div>
+
+        <div class="hero-content">
+            <h1 class="gradient-text">3D Metric-Semantic Scene Reconstruction</h1>
+            <p>An end-to-end computer vision pipeline converting raw RGB video and ARKit tracking into queryable
+                mathematical 3D scene graphs via Semantic Loop Closure.</p>
+        </div>
+    </header>
+
+    <main>
+        <!-- Abstract & Input -->
+        <section class="research-block split-view">
+            <div class="text-content">
+                <h2>Abstract & Fundamental Theory</h2>
+                <p>The reconstruction of 3D environments with semantic understanding is a critical step for autonomous
+                    robotics and spatial AI. Traditional SLAM provides sparse geometric tracking but lacks dense surface
+                    or semantic object awareness.</p>
+                <p>This project bridges the gap by integrating <strong>3D Gaussian Splatting (3DGS & SuGaR)</strong> for
+                    high-fidelity continuous surface reconstruction, and open-vocabulary 2D foundation models
+                    (<strong>YOLO World</strong> and <strong>SAM 2</strong>) for zero-shot temporal object tracking.</p>
+            </div>
+            <div class="visuals single-visual">
+                <div class="img-wrapper">
+                    <img src="assets/frame_0001.jpg" alt="Raw Video Frame">
+                    <div class="caption">Input Dataset: iPhone 14 RGB (5 FPS)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 1 -->
+        <section class="research-block split-view reverse">
+            <div class="text-content">
+                <h2>Phase 1: 3D Surface Reconstruction</h2>
+                <p>The pipeline begins by mathematically estimating camera poses and extracting sparse structural
+                    features from the raw video sequence using <strong>COLMAP</strong> Structure-from-Motion (SFM).</p>
+                <p>To achieve a continuous, high-fidelity physical geometry, we train a 3D Gaussian Splatting model via
+                    <strong>SuGaR</strong>, generating a dense, mesh-aligned 3D point cloud representing the raw
+                    surfaces of the room without any semantic injection.
+                </p>
+            </div>
+            <div class="visuals double-visual">
+                <div class="img-wrapper"><img src="assets/colmap_ply.png" alt="COLMAP Point Cloud">
+                    <div class="caption">Sparse COLMAP Cloud</div>
+                </div>
+                <div class="img-wrapper"><img src="assets/3dgs_sugar_ply.gif" alt="SuGaR 3D Splatting">
+                    <div class="caption">Dense SuGaR Splats</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Phase 2 -->
+        <section class="research-block split-view">
+            <div class="text-content">
+                <h2>Phase 2: Semantic Loop Closure</h2>
+                <p>Independently from the 3D splatting, we utilize <strong>YOLO World</strong> and <strong>SAM
+                        2</strong> to perform open-vocabulary zero-shot segmentation and temporal mask tracking across
+                    the 2D frame sequence.</p>
+                <p>These 2D target masks are spatially projected and lifted into the 3D point cloud space. Because
+                    object tracking frequently shatters across occlusions (e.g., <code>bed_1</code> vs
+                    <code>bed_2</code>), we introduced a novel <strong>Semantic Loop Closure</strong> algorithm. It
+                    autonomously fuses fragmented point clouds of identical classes based on strict 3D Euclidean
+                    bounding box proximity, resulting in clean, singular semantic entities.
+                </p>
+            </div>
+            <div class="visuals double-visual">
+                <div class="img-wrapper"><img src="assets/tracking_mask.gif" alt="Tracking Masks">
+                    <div class="caption">SAM 2 Temporal Masks</div>
+                </div>
+                <div class="img-wrapper"><img src="assets/segmented_scene_ply.gif" alt="Segmented 3D">
+                    <div class="caption">Loop-Closed 3D Fusion</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Math & Alignment -->
+        <section class="research-block split-view reverse">
+            <div class="text-content">
+                <h2>Metric Scale & Scene Graphs</h2>
+                <p>Standard COLMAP reconstructions are strictly dimensionless. By extracting the hardware iOS ARKit
+                    trajectory alongside the video, we rigidly align the two flight paths using a <strong>Sim3
+                        transformation matrix</strong>. This mathematically scales the 3D scene directly into real-world
+                    physical meters.</p>
+                <p>We subsequently employ Principal Component Analysis (PCA) strictly against the physical
+                    gravity-aligned XZ floor plane. This produces accurate <strong>Oriented Bounding Boxes
+                        (OBBs)</strong> for all semantic objects sans skew distortion. We then compute logical
+                    interaction predicates (e.g. <code>resting_on</code>, <code>next_to</code>) to output the final
+                    Topological Scene Graph.</p>
+            </div>
+            <div class="visuals double-visual">
+                <div class="img-wrapper"><img src="assets/trajectory_plot.png" alt="ARKit Alignment">
+                    <div class="caption">Metric ARKit Trajectory Math</div>
+                </div>
+                <div class="img-wrapper"><img src="assets/network_graph_map.png" alt="Network Graph">
+                    <div class="caption">Predicate Edge Topology Graph</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Architecture Flow -->
+        <section class="research-block stacked-view">
+            <div class="text-content" style="text-align:center; max-width:800px; margin: 0 auto 2rem auto;">
+                <h2>Architectural Decisions</h2>
+                <p>Our core framework decision decouple structural visual reconstruction (Phase 1) from open-vocabulary
+                    semantic tracking (Phase 2) enabled both layers to execute without encountering localized VRAM
+                    memory-overflows.</p>
+            </div>
+            <div class="arch-container">
+                <img src="assets/architecture_flowchart.png" alt="Architecture Flowchart">
+            </div>
+        </section>
+
+        <!-- LLM and Future -->
+        <section class="research-block split-view">
+            <div class="code-window">
+                <div class="window-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                </div>
+                <pre><code><span style="color: #4facfe;">❯</span> python3 query.py "relationship between coffee mug, water bottle, desk"
+
+<span style="color: #ffbd2e;">🤖 Sending query...</span>
+==================================================
+Based on the provided data:
+
+<span style="color: #fff;">1. Water Bottle and Workdesk:</span>
+- Distance: 1.23 meters
+- Relationship: directly above
+<span style="color: #888;">note: suggests it is on a shelf overhead.</span>
+
+<span style="color: #fff;">2. Coffee Mug and Water Bottle:</span>
+- Distance: 0.22 meters
+- Relationship: next to
+
+<span style="color: #00f2fe; font-weight:bold;">Final Answer:</span>
+Both items are directly above the workdesk placed side by side.
+==================================================</code></pre>
+            </div>
+
+            <div class="text-content">
+                <h2>Discussion & LLM Querying</h2>
+                <p>Rather than injecting millions of highly dense, texturally colored 3D splats into a slow
+                    vision-transformer, we compile the topological Scene Graph into an ultra-lightweight rigid JSON
+                    structure.</p>
+                <p>When injected as context into <strong>Ollama (Llava/Llama-3)</strong>, the agent possesses pure,
+                    hallucination-free spatial awareness. It organically reasons about physical metric distance and
+                    structural geometry in single-shot inference.</p>
+                <h3 style="margin-top:2rem; font-size:1.3rem;">Limitations & Future Work</h3>
+                <p style="font-size:0.95rem; color:#aaa;">Relying on SAM 2 temporal masks inherently struggles against
+                    rapidly moving, deformable subjects due to extreme motion blur before 3D lifting occurs. Future
+                    permutations will directly query visual clip-embedding vectors layered directly into the Gaussian
+                    Splats, bypassing 2D temporal occlusion tracking entirely.</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Built by Pranav Deshakulkarni Manjunath.</p>
+    </footer>
+</body>
+
+</html>

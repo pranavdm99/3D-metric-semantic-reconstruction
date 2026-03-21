@@ -17,7 +17,7 @@ An end-to-end computer vision pipeline that converts raw RGB video and ARKit tra
 
 ---
 
-**Input Dataset:** Video captured using iPhone 14 Pro in the CamTrackAR app, with frames extracted at 5 FPS. 
+**Input Dataset:** Video captured using iPhone 14 in the CamTrackAR app, with frames extracted at 5 FPS. 
 
 ![Raw Video Frame Overview](docs/assets/frame_0001.jpg)
 
