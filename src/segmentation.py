@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Segmentation: Semantic Grounding & 3D Segmentation
-Uses Qwen3-VL for object detection and SAM2 for mask tracking
+Uses YOLO World for object detection and SAM2 for mask tracking
 """
 
 import os
@@ -176,10 +176,13 @@ class SAM2Segmenter:
         
         # SAM 2 strictly expects numeric filenames in some environments
         tmp_frames_dir = Path("/tmp/sam2_frames")
-        if not tmp_frames_dir.exists():
-            tmp_frames_dir.mkdir(parents=True)
-            for i, frame_path in enumerate(frames):
-                (tmp_frames_dir / f"{i:05d}.jpg").symlink_to(frame_path)
+        if tmp_frames_dir.exists():
+            import shutil
+            shutil.rmtree(tmp_frames_dir)
+        
+        tmp_frames_dir.mkdir(parents=True)
+        for i, frame_path in enumerate(frames):
+            (tmp_frames_dir / f"{i:05d}.jpg").symlink_to(frame_path.resolve())
         
         all_object_masks = {}
         
@@ -580,9 +583,21 @@ class SegmentationPipeline:
         torch.cuda.empty_cache()
         
         # Step 3: 3D lifting
-        print("\n🚀 Step 3: Lift masks to 3D")
+        print("\nStep 3: Lift masks to 3D")
         splat_path = Path(self.reconstruction_meta['ply_path'])
         mask_metadata = self.lift_masks_to_3d(object_masks, splat_path)
+        
+        # Step 4: Visualization
+        print("\nStep 4: Generating colored point cloud visualization")
+        subprocess.run([
+            'python', '/workspace/src/utils/visualize_segmentation.py'
+        ], check=False)
+        
+        # Step 5: Scene Graph Generation
+        print("\nStep 5: Generating 3D Metric Scene Graph")
+        subprocess.run([
+            'python', '/workspace/src/utils/generate_scene_graph.py'
+        ], check=False)
         
         print("\n" + "=" * 60)
         print("SEGMENTATION COMPLETE!")

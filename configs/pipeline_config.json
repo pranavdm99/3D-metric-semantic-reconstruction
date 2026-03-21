@@ -1,5 +1,5 @@
 {
-  "project_name": "Physics-Ready Video Pipeline",
+  "project_name": "Scene Reconstruction",
   "description": "End-to-end pipeline for converting real-world video into photorealistic physics simulation assets",
   "reconstruction": {
     "name": "Neural Reconstruction & Surface Alignment",
@@ -33,13 +33,30 @@
       "bed",
       "fabric wardrobe",
       "monitor",
-      "dresser"
+      "dresser",
+      "keyboard",
+      "mouse",
+      "trashcan",
+      "window blinds",
+      "door",
+      "clothes hanger",
+      "shoe rack",
+      "laundry hamper",
+      "headphones",
+      "nightstand",
+      "carafe",
+      "water bottle",
+      "flask",
+      "coffee mug",
+      "doormat",
+      "pillow",
+      "comforter",
+      "cardboard box",
+      "clear storage bin"
     ],
-    "vlm_model": "qwen3-vl:8b-instruct",
     "sam2_model": "sam2_hiera_small",
     "confidence_threshold": 0.5,
     "notes": [
-      "Qwen3-VL unloads from VRAM after inference using --keepalive 0",
       "SAM2 processes video frames in batches to manage memory"
     ]
   },

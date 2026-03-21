@@ -1,4 +1,4 @@
-# Segmentation: Semantic Grounding & 3D Segmentation (Qwen3-VL + SAM2)
+# Segmentation: Semantic Grounding & 3D Segmentation (YOLO World + SAM2)
 FROM semantic-scene-base:latest
 
 # Install SAM 2 dependencies

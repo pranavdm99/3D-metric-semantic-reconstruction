@@ -69,7 +69,7 @@ class ReconstructionPipeline:
         
         try:
             # Use absolute path instead of symlink if possible
-            subprocess.run(['ln', '-s', str(frames_dir), str(images_dir)], check=True)
+            subprocess.run(['ln', '-s', str(frames_dir.resolve()), str(images_dir)], check=True)
         except Exception:
             import shutil
             shutil.copytree(frames_dir, images_dir)
@@ -171,6 +171,16 @@ class ReconstructionPipeline:
             '--output_path', str(sparse_dir / '0'),
             '--output_type', 'TXT'
         ], check=True, env=colmap_env)
+
+        if align_ar_scale and ar_data_path:
+            print("Generating 3D trajectory plot overlay...")
+            plot_path = colmap_dir / 'trajectory_plot.png'
+            subprocess.run([
+                'python', '/workspace/src/utils/plot_trajectory.py',
+                '--ar_data', str(Path('/workspace') / ar_data_path),
+                '--colmap_images', str(sparse_dir / '0' / 'images.txt'),
+                '--output', str(plot_path)
+            ], check=False)
         
         print(f"COLMAP output saved to {colmap_dir}")
         return colmap_dir

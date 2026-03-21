@@ -13,6 +13,7 @@ RUN apt-get update && \
     wget \
     curl \
     zstd \
+    jq \
     build-essential \
     cmake \
     libglib2.0-0 \
