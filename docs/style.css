@@ -8,6 +8,16 @@
     --blur: blur(16px);
 }
 
+img { 
+    max-width: 100%; 
+    height: auto; 
+    border-radius: 8px; 
+    pointer-events: none; 
+    user-select: none; 
+    -webkit-user-drag: none; 
+    -webkit-touch-callout: none;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
@@ -19,7 +29,7 @@ body {
 /* Typography */
 h1, h2, h3 { color: white; font-family: 'Outfit', sans-serif; letter-spacing: -0.5px; }
 h2 { font-size: 2.2rem; margin-bottom: 1.2rem; line-height: 1.2; }
-p { color: #b0b0b0; font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.7; }
+p { color: #b0b0b0; font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.7; text-align: justify; }
 strong { color: white; font-weight: 600; }
 
 .gradient-text {
@@ -49,10 +59,10 @@ strong { color: white; font-weight: 600; }
     padding: 8rem 2rem 4rem; text-align: center; display: flex; flex-direction: column; align-items: center;
     border-bottom: 1px solid var(--border);
 }
-.hero-content { max-width: 800px; margin-bottom: 0; }
+.hero-content { max-width: 1200px; margin-bottom: 0; }
 
 /* Main Layout */
-main { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
+main { max-width: 1500px; margin: 0 auto; padding: 4rem 2rem; }
 
 .research-block {
     margin-bottom: 4rem;
@@ -73,6 +83,18 @@ main { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
 }
 .split-view.reverse > * {
     direction: ltr; /* Reset text direction inside */
+}
+
+/* Full Width Academic Rows */
+.text-block-full {
+    max-width: 100%;
+    margin: 0 auto;
+}
+.text-block-full li {
+    color: #ccc;
+    font-size: 1.05rem;
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
 }
 
 /* Image Visuals */
@@ -109,7 +131,7 @@ main { max-width: 1200px; margin: 0 auto; padding: 4rem 2rem; }
     display: flex; justify-content: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
 }
-.arch-container img { max-width: 100%; height: auto; border-radius: 6px; }
+.arch-container img { max-width: 100%; max-height: 550px; object-fit: contain; border-radius: 6px; }
 
 /* LLM Terminal */
 .code-window {

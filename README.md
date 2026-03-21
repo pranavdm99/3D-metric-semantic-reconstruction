@@ -27,6 +27,14 @@ This project is divided into two primary phases that can be executed via Docker.
 
 ![Pipeline Architecture Diagram](docs/assets/architecture_flowchart.png)
 
+> [!CAUTION]
+> **System Hardware Requirements**
+> This pipeline is highly computationally intensive due to 3DGS training and SAM 2 temporal tracking. It was successfully engineered, patched, and validated locally on a consumer laptop with the following specifications:
+> - **GPU**: NVIDIA RTX 4060 (8GB VRAM minimum) 
+> - **RAM**: 16GB System Memory
+> - **Machine**: Dell G15 5530 
+> - **Environment**: Docker Engine w/ NVIDIA Container Toolkit
+
 ### Phase 1: 3D Reconstruction (`make reconstruction`)
 
 1. **Pose Estimation**: Uses COLMAP to extract frames, compute features, and estimate initial camera poses.

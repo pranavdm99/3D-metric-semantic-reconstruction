@@ -34,7 +34,7 @@ def main():
         with open(args.colmap_images, 'r') as f:
             lines = f.readlines()
         
-        # In COLMAP images.txt, camera lines alternate with 2D point lines. Camera lines have 10+ elements.
+        # In COLMAP images.txt, camera lines alternate with 2D point lines.
         for line in lines:
             if line.startswith('#'): continue
             parts = line.strip().split()
@@ -42,25 +42,30 @@ def main():
             if len(parts) >= 10 and parts[0].isdigit() and parts[8].isdigit():
                 qw, qx, qy, qz = map(float, parts[1:5])
                 tx, ty, tz = map(float, parts[5:8])
+                filename = parts[9]
                 # scipy expects x, y, z, w
                 r = Rotation.from_quat([qx, qy, qz, qw])
                 t = np.array([tx, ty, tz])
                 camera_center = -r.as_matrix().T @ t
-                colmap_pos_list.append(camera_center)
+                colmap_pos_list.append((filename, camera_center))
                 
         if colmap_pos_list:
-            colmap_positions = np.array(colmap_pos_list)
-            print(f"Loaded {len(colmap_positions)} SfM poses.")
+            # Sort chronologically by filename (e.g. frame_0001.jpg -> frame_0295.jpg)
+            colmap_pos_list.sort(key=lambda x: x[0])
+            colmap_positions = np.array([pos for _, pos in colmap_pos_list])
+            print(f"Loaded {len(colmap_positions)} chronologically sorted SfM poses.")
 
-    fig = plt.figure(figsize=(16, 8))
+    fig = plt.figure(figsize=(12, 6))
     
     # --- 3D Trajectory Plot ---
     ax1 = fig.add_subplot(121, projection='3d')
-    ax1.plot(positions[:, 0], positions[:, 1], positions[:, 2], label='ARKit Trajectory', color='b', marker='.', markersize=2, linewidth=1)
+    ax1.plot(positions[:, 0], positions[:, 1], positions[:, 2], label='ARKit Trajectory', color='b', marker='.', markersize=4, linewidth=2)
     
     if colmap_positions is not None:
         ax1.plot(colmap_positions[:, 0], colmap_positions[:, 1], colmap_positions[:, 2], 
-                 label='COLMAP SfM Path', color='orange', marker='+', markersize=4, linestyle='dashed')
+                 label='COLMAP SfM Path', color='purple', marker='+', markersize=4, linestyle='--')
+        ax1.scatter(colmap_positions[0, 0], colmap_positions[0, 1], colmap_positions[0, 2], color='g', s=80, label='SfM Start', zorder=6, marker='s')
+        ax1.scatter(colmap_positions[-1, 0], colmap_positions[-1, 1], colmap_positions[-1, 2], color='r', s=80, label='SfM End', zorder=6, marker='s')
 
     ax1.scatter(positions[0, 0], positions[0, 1], positions[0, 2], color='g', s=100, label='AR Start', zorder=5)
     ax1.scatter(positions[-1, 0], positions[-1, 1], positions[-1, 2], color='r', s=100, label='AR End', zorder=5)
@@ -89,10 +94,12 @@ def main():
 
     # --- 2D Top-Down (Bird's Eye) Plot (XZ Plane) ---
     ax2 = fig.add_subplot(122)
-    ax2.plot(positions[:, 0], positions[:, 2], label='ARKit Path (XZ)', color='b', marker='.', markersize=2, linewidth=1)
+    ax2.plot(positions[:, 0], positions[:, 2], label='ARKit Path (XZ)', color='b', marker='.', markersize=4, linewidth=2)
     
     if colmap_positions is not None:
-        ax2.plot(colmap_positions[:, 0], colmap_positions[:, 2], label='SfM Path (XZ)', color='orange', marker='+', markersize=4, linestyle='dashed')
+        ax2.plot(colmap_positions[:, 0], colmap_positions[:, 2], label='SfM Path (XZ)', color='purple', marker='+', markersize=4, linestyle='--')
+        ax2.scatter(colmap_positions[0, 0], colmap_positions[0, 2], color='g', s=80, label='SfM Start', zorder=6, marker='s')
+        ax2.scatter(colmap_positions[-1, 0], colmap_positions[-1, 2], color='r', s=80, label='SfM End', zorder=6, marker='s')
 
     ax2.scatter(positions[0, 0], positions[0, 2], color='g', s=100, label='AR Start', zorder=5)
     ax2.scatter(positions[-1, 0], positions[-1, 2], color='r', s=100, label='AR End', zorder=5)
