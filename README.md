@@ -2,6 +2,7 @@
 
 An end-to-end computer vision pipeline that converts raw RGB video and ARKit tracking data into a mathematically precise, queryable 3D semantic scene graph.
 
+
 |                COLMAP Sparse Point Cloud                 |                           SuGaR 3D Splatting                           |
 | :------------------------------------------------------: | :--------------------------------------------------------------------: |
 | ![COLMAP Sparse Point Cloud](docs/assets/colmap_ply.png) | ![SuGaR 3D Point Cloud Representation](docs/assets/3dgs_sugar_ply.gif) |
@@ -16,13 +17,15 @@ An end-to-end computer vision pipeline that converts raw RGB video and ARKit tra
 
 ---
 
-## Pipeline Architecture
-
-Video captured using iPhone 14 Pro in CamTrackAR app and frames extracted at 5 FPS. 
+**Input Dataset:** Video captured using iPhone 14 Pro in the CamTrackAR app, with frames extracted at 5 FPS. 
 
 ![Raw Video Frame Overview](docs/assets/frame_0001.jpg)
+
+## Pipeline Architecture
+
 This project is divided into two primary phases that can be executed via Docker.
 
+![Pipeline Architecture Diagram](docs/assets/architecture_flowchart.png)
 
 ### Phase 1: 3D Reconstruction (`make reconstruction`)
 
@@ -46,10 +49,30 @@ This project is divided into two primary phases that can be executed via Docker.
 
 The system includes a local LLM interface (`src/utils/query_scene.py`) running via Ollama. By injecting the `scene_graph.json` as grounded physical context, the LLM can answer questions using explicit physical spatial reasoning.
 
-**Example Usage:**
+**Example Interaction:**
 ```bash
-python3 src/utils/query_scene.py "What objects are resting on the workdesk?"
-python3 src/utils/query_scene.py "What is the relationship between the door and the bed?"
+❯ python3 src/utils/query_scene.py "what is the relationship between the coffee mug, water bottle and the workdesk?"
+
+🤖 Sending query: 'what is the relationship between the coffee mug, water bottle and the workdesk?'
+==================================================
+Based on the provided data, here's the spatial relationship between the coffee mug, water bottle, and workdesk:
+
+1. Water Bottle and Workdesk:
+- Distance: 1.23 meters
+- Relationship: directly above
+note: The water bottle is directly above the workdesk, but not on it. (Suggests it is on a shelf).
+
+2. Coffee Mug and Workdesk:
+- Distance: 1.15 meters
+- Relationship: directly above
+
+3. Coffee Mug and Water Bottle:
+- Distance: 0.22 meters
+- Relationship: next to
+
+Final Answer:
+The coffee mug and water bottle are both directly above the workdesk, and they are positioned next to each other. They appear to be on the same shelf or surface above the workdesk, likely placed side by side.
+==================================================
 ```
 
 ## Setup & Execution
