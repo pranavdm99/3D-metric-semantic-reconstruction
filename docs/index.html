@@ -65,8 +65,8 @@
             </div>
             <div class="visuals single-visual">
                 <div class="img-wrapper">
-                    <img src="assets/frame_0001.jpg" alt="Raw Video Frame">
-                    <div class="caption">Input Dataset: iPhone 14 RGB (59 seconds)</div>
+                    <img src="assets/segmented_scene_ply.gif" alt="3D Segmented Reconstruction">
+                    <div class="caption">3D Segmented Surface</div>
                 </div>
             </div>
         </section>
@@ -145,12 +145,15 @@
                     this surface down to a highly-refined, mesh-aligned cloud containing exactly <strong>303,738
                         pristine 3D splats</strong>.</p>
             </div>
-            <div class="visuals double-visual">
+            <div class="visuals triple-visual">
+                <div class="img-wrapper"><img src="assets/input.gif" alt="Raw Input Sequence">
+                    <div class="caption">1. Raw RGB Dataset</div>
+                </div>
                 <div class="img-wrapper"><img src="assets/colmap_ply.png" alt="COLMAP Point Cloud">
-                    <div class="caption">Sparse COLMAP Cloud</div>
+                    <div class="caption">2. Sparse COLMAP Cloud</div>
                 </div>
                 <div class="img-wrapper"><img src="assets/3dgs_sugar_ply.gif" alt="SuGaR 3D Splatting">
-                    <div class="caption">Pruned 303k Dense SuGaR Splats</div>
+                    <div class="caption">3. Pruned 303k Dense Splats</div>
                 </div>
             </div>
         </section>
@@ -365,22 +368,7 @@ Both items are directly above the workdesk placed side by side.
 
         <!-- Full Width Final Sections -->
         <section class="research-block text-block-full">
-            <h2>Downstream Applications</h2>
-            <p>This rigid topological formulation directly abstracts physical reality into heavily optimized predicates,
-                which drastically accelerates and unlocks complex downstream use-cases:</p>
-            <ul>
-                <li><strong>Advanced Photogrammetry & Surveying:</strong> Leveraging the 1.72cm metric alignment error
-                    to
-                    perform real-world volume extraction without a LiDAR module.</li>
-                <li><strong>Novel View Synthesis (NVS):</strong> Rapid architectural planning where designers can
-                    navigate camera orbits around cleanly identified, isolated sub-meshes instead of dense uniform
-                    arrays.</li>
-                <li><strong>Spatial Q&A & Semantic Interaction:</strong> Enabling localized NLP-based spatial
-                    reasoning within complex physical environments, allowing for grounded semantic queries and
-                    interaction layers safely isolated from cloud latency.</li>
-            </ul>
-
-            <h2 style="margin-top:4rem;">Conclusion</h2>
+            <h2>Conclusion</h2>
             <p>This study successfully demonstrates a holistic, end-to-end pipeline for converting unstructured RGB
                 video into a metric-accurate, semantically-aware 3D scene representation. By rigidly aligning sparse
                 COLMAP trajectories with absolute ARKit IMU data using an optimized Sim(3) transformation, we achieved a
@@ -389,7 +377,23 @@ Both items are directly above the workdesk placed side by side.
                 2) enabled the generation of a queryable Topology Graph that yields grounded spatial predicates,
                 effectively bypassing the visual hallucinations common in large vision-language models.</p>
 
-            <p><strong>Limitations:</strong> Currently, the pipeline's reliance on 2D temporal masks makes it
+            <!-- <h3 style="color: var(--accent1); margin-top: 2rem;">Impact & Downstream Applications</h3> -->
+            <p style="margin-top: 2rem;"><strong>Impact and Applications:</strong> This rigid topological formulation
+                directly abstracts physical reality into optimized predicates, which drastically accelerates several
+                downstream use-cases:</p>
+            <ul style="padding-left: 1.5rem; margin-top: 1rem;">
+                <li style="margin-bottom: 0.8rem;"><strong>Advanced Photogrammetry & Surveying:</strong> Leveraging the 1.72cm metric alignment error
+                    to perform real-world volume extraction without a LiDAR module.</li>
+                <li style="margin-bottom: 0.8rem;"><strong>Novel View Synthesis (NVS):</strong> Rapid architectural planning where designers can
+                    navigate camera orbits around cleanly identified, isolated sub-meshes instead of dense uniform
+                    arrays.</li>
+                <li style="margin-bottom: 0.8rem;"><strong>Spatial Q&A & Semantic Interaction:</strong> Enabling localized NLP-based spatial
+                    reasoning within complex physical environments, allowing for grounded semantic queries and
+                    interaction layers safely isolated from cloud latency.</li>
+            </ul>
+
+            <p style="margin-top: 2rem;"><strong>Limitations:</strong> Currently, the pipeline's reliance on 2D temporal
+                masks makes it
                 susceptible to motion blur and non-rigid deformations during rapid camera movements. Furthermore,
                 high-fidelity geometry extraction via surface-aligned splatting mathematically requires comprehensive
                 orbital captures; linear translational trajectories inherently result in flattened occlusion planes

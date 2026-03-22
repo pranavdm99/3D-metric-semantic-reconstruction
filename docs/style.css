@@ -100,6 +100,7 @@ main { max-width: 1500px; margin: 0 auto; padding: 4rem 2rem; }
 /* Image Visuals */
 .visuals { width: 100%; display: grid; gap: 1.5rem; }
 .double-visual { grid-template-columns: 1fr 1fr; }
+.triple-visual { grid-template-columns: 1fr 1fr 1fr; }
 .single-visual { grid-template-columns: 1fr; }
 
 .img-wrapper {
@@ -153,6 +154,7 @@ footer { text-align: center; padding: 3rem; color: #555; border-top: 1px solid v
 
 @media (max-width: 900px) {
     .split-view { grid-template-columns: 1fr; gap: 2.5rem; }
+    .visuals.triple-visual { grid-template-columns: 1fr; }
     .split-view.reverse { direction: ltr; }
     .hero { padding: 7rem 1.5rem 3rem; }
     .gradient-text { font-size: 2.8rem; }
