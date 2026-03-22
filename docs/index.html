@@ -33,26 +33,33 @@
         <section class="research-block split-view">
             <div class="text-content">
                 <h2>Introduction</h2>
-                <p style="font-size:1.05rem; color:#ccc;">Traditional Structure-from-Motion (SfM) architectures provide precise 
-                    sparse tracking but lack the dense surface representation or semantic awareness required for 
-                    complex spatial reasoning. This project <strong>integrates</strong> a unified, three-stage neural 
-                        reconstruction pipeline that bridges this gap entirely from an RGB video, without 
+                <p style="font-size:1.05rem; color:#ccc;">Traditional Structure-from-Motion (SfM) architectures provide
+                    precise
+                    sparse tracking but lack the dense surface representation or semantic awareness required for
+                    complex spatial reasoning. This project <strong>integrates</strong> a unified, three-stage neural
+                    reconstruction pipeline that bridges this gap entirely from an RGB video, without
                     relying on active LiDAR depth-sensors.</p>
-                <p>Our methodology simultaneously extracts raw <strong>Geometric Foundations (SfM Trajectory)</strong> 
-                    and high-fidelity <strong>Neural Surfaces (3D Gaussian Splatting)</strong>, which are then 
-                    mathematically unified into a structured <strong>Topological Scene Graph</strong>. By intertwining 
-                    open-vocabulary foundation models (YOLO World + SAM 2) with surface-aligned splatting (SuGaR), we 
-                    achieve a grounded 3D representation where geometry and semantics are directly queryable through 
+                <p>Our methodology simultaneously extracts raw <strong>Geometric Foundations (SfM Trajectory)</strong>
+                    and high-fidelity <strong>Neural Surfaces (3D Gaussian Splatting)</strong>, which are then
+                    mathematically unified into a structured <strong>Topological Scene Graph</strong>. By intertwining
+                    open-vocabulary foundation models (YOLO World + SAM 2) with surface-aligned splatting (SuGaR), we
+                    achieve a grounded 3D representation where geometry and semantics are directly queryable through
                     natural language.</p>
                 <div class="gallery-wrapper" style="display: flex; gap: 1.5rem; margin-top: 2.5rem; flex-wrap: wrap;">
-                    <div class="img-wrapper" style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
-                        <img src="assets/sfm_visual.png" alt="SfM & Geometry" style="width: 100%; height: auto; border-radius: 12px;">
+                    <div class="img-wrapper"
+                        style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
+                        <img src="assets/sfm_visual.png" alt="SfM & Geometry"
+                            style="width: 100%; height: auto; border-radius: 12px;">
                     </div>
-                    <div class="img-wrapper" style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
-                        <img src="assets/hero_visual.png" alt="Semantic Splatting Hero" style="width: 100%; height: auto; border-radius: 12px;">
+                    <div class="img-wrapper"
+                        style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
+                        <img src="assets/hero_visual.png" alt="Semantic Splatting Hero"
+                            style="width: 100%; height: auto; border-radius: 12px;">
                     </div>
-                    <div class="img-wrapper" style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
-                        <img src="assets/graph_visual.png" alt="Scene Graph Topology" style="width: 100%; height: auto; border-radius: 12px;">
+                    <div class="img-wrapper"
+                        style="border: none; box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 180px; max-width: 200px;">
+                        <img src="assets/graph_visual.png" alt="Scene Graph Topology"
+                            style="width: 100%; height: auto; border-radius: 12px;">
                     </div>
                 </div>
             </div>
@@ -63,7 +70,7 @@
                 </div>
             </div>
         </section>
-        
+
 
 
         <!-- Related Works -->
@@ -72,15 +79,19 @@
             <p>Our methodology builds upon the foundations of open-vocabulary 3D scene understanding, most notably
                 drawing parallels to <strong>HOV-SG</strong> and <strong>ConceptGraphs</strong>. By lifting 2D
                 foundation model outputs (YOLO World, SAM 2) into 3D space, we share the core objective of bridging
-                low-level geometric reconstruction with high-level semantic reasoning. However, we <strong>implement</strong> several
-                critical structural optimizations and physical grounding techniques to facilitate this specific use-case. </p>
+                low-level geometric reconstruction with high-level semantic reasoning. However, we
+                <strong>implement</strong> several
+                critical structural optimizations and physical grounding techniques to facilitate this specific
+                use-case.
+            </p>
 
             <p><strong>Surface Representation:</strong> While research baselines like ConceptGraphs primarily rely on
                 discrete point or voxel representations, we utilize <strong>SuGaR (Surface-Aligned Splatting)</strong>.
                 This provides a continuous, mesh-like surface representation that is significantly higher fidelity and
                 more efficient for downstream rendering and physics interactions.</p>
 
-            <p><strong>Metric Grounding:</strong> A key feature of this implementation is the solution to the "dimensionless" nature
+            <p><strong>Metric Grounding:</strong> A key feature of this implementation is the solution to the
+                "dimensionless" nature
                 of COLMAP. By integrating raw <strong>ARKit IMU trajectory data</strong> and applying an optimized
                 Sim(3) transformation, we achieve a verified <strong>1.7cm RMSE</strong> scale accuracy, providing true
                 physical grounding from a single RGB video without relying on LiDAR or active depth sensors.</p>
@@ -97,8 +108,8 @@
             <div class="text-content">
                 <h2>Methodology</h2>
                 <p>The system architecture is designed as a modular, feed-forward pipeline that transitions from raw,
-                    unstructured RGB-D video into a structured mathematical 3D scene representation. As visualized in
-                     the flowchart to the right, the process begins by simultaneously extracting sparse camera
+                    unstructured RGB video into a structured mathematical 3D scene representation. As visualized in
+                    the flowchart to the right, the process begins by simultaneously extracting sparse camera
                     trajectories through <strong>COLMAP (Phase 1)</strong> while performing zero-shot object detection
                     and temporal tracking via <strong>YOLO World and SAM 2 (Phase 2)</strong>. These parallel tracks are
                     then unified through a <strong>Semantic Loop Closure</strong> algorithm that lifts 2D projections
@@ -109,7 +120,9 @@
                     pivots. We forcibly decoupled the geometric and semantic processing stages to prevent cumulative
                     memory fragmentation during training. Furthermore, we developed runtime logic patches for the SuGaR
                     <code>CamerasWrapper</code> modules, enabling dynamic resolution rescaling and hyper-parameter
-                    downscales to maintain high surface fidelity within a containerized, 8GB-constrained compute footprint.</p>
+                    downscales to maintain high surface fidelity within a containerized, 8GB-constrained compute
+                    footprint.
+                </p>
             </div>
             <div class="visuals single-visual">
                 <div class="arch-container">
@@ -150,10 +163,13 @@
                         World</strong> and <strong>SAM 2</strong> to perform zero-shot segmentation and temporal mask
                     tracking across the heavily down-sampled image sequence.</p>
                 <p>Because temporal tracking masks frequently shatter across visual occlusions (e.g., separating a bed
-                    into <code>bed_1</code> vs <code>bed_2</code>), we <strong>implement</strong> a mathematical <strong>Semantic Loop
-                        Closure</strong> technique. By lifting masks into the metric 3D cloud, we autonomously merge fragmented
+                    into <code>bed_1</code> vs <code>bed_2</code>), we <strong>implement</strong> a mathematical
+                    <strong>Semantic Loop
+                        Closure</strong> technique. By lifting masks into the metric 3D cloud, we autonomously merge
+                    fragmented
                     point clouds of identical string-classes if their 3D Euclidean bounding boxes fall within tight
-                    metric proximities.</p>
+                    metric proximities.
+                </p>
             </div>
             <div class="visuals double-visual">
                 <div class="img-wrapper"><img src="assets/tracking_mask.gif" alt="Tracking Masks">
@@ -219,7 +235,89 @@
             </div>
         </section>
 
+        <section class="research-block text-block-full">
+            <h2>Discussion</h2>
 
+            <div class="split-view" style="margin-bottom: 3rem; align-items: start;">
+                <div class="text-content">
+                    <h3>Sparse vs. Surface-Aligned Geometry</h3>
+                    <p>A careful audit of the raw structure-from-motion outputs reveals a fundamental limitation of
+                        traditional feature-tracking.
+                        The point distribution in <strong>COLMAP (SIFT)</strong> is extremely sparse and almost
+                        exclusively
+                        concentrated along <strong>high-contrast edges and texture boundaries</strong>. While this is
+                        SIFT performing exactly as designed, it leaves the central surfaces of objects (desks, monitors,
+                        doors)
+                        geometrically empty.</p>
+                    <p>By contrast, <strong>SuGaR</strong> does not merely "densify" the cloud. It introduces critical
+                        <strong>surface regularization</strong> during the refinement stage. This ensures that Gaussians
+                        are mathematically pulled onto the actual manifold geometry of the scene, preventing the
+                        "floating splat" artifacts common in vanilla 3DGS and providing a continuous substrate for
+                        robust 3D semantic mask-lifting.
+                    </p>
+                </div>
+                <div class="visuals single-visual">
+                    <div class="visuals double-visual" style="margin-bottom: 1rem; gap: 1rem;">
+                        <div class="img-wrapper"
+                            style="border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            <img src="assets/points_colmap_work_area.png" alt="COLMAP Sparse Points"
+                                style="width: 100%; height: auto;">
+                            <div class="caption"
+                                style="background: rgba(0,0,0,0.7); padding: 0.5rem; font-size: 0.8rem;">COLMAP:
+                                Edge-Based Sparse (18k pts)</div>
+                        </div>
+                        <div class="img-wrapper"
+                            style="border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            <img src="assets/points_3dgs_segmented_work_area.png" alt="SuGaR Semantic Splats"
+                                style="width: 100%; height: auto;">
+                            <div class="caption"
+                                style="background: rgba(0,0,0,0.7); padding: 0.5rem; font-size: 0.8rem;">SuGaR:
+                                Surface-Regularized Gaussian centers with Semantic Masks (303k pts)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 2rem;">
+                <!-- <h3 style="font-size: 1.2rem; margin-bottom: 1.5rem; color: var(--accent1);">Empirical Performance
+                    Metrics</h3> -->
+                <h2>Empirical Performance Metrics</h2>
+                <table style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                            <th style="padding: 1rem 0.5rem;">Metric</th>
+                            <th style="padding: 1rem 0.5rem;">COLMAP</th>
+                            <th style="padding: 1rem 0.5rem; color: #fff;">SuGaR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem 0.5rem;">Point Density</td>
+                            <td style="padding: 1rem 0.5rem;">18,508 vertices</td>
+                            <td style="padding: 1rem 0.5rem; font-weight: 600;">303,738 vertices
+                            </td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
+                            <td style="padding: 1rem 0.5rem;">Surface Continuity</td>
+                            <td style="padding: 1rem 0.5rem;">Sparse / Edge-Centered</td>
+                            <td style="padding: 1rem 0.5rem;">Manifold / Complete</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 1rem 0.5rem;">Mask Lifting Alignment</td>
+                            <td style="padding: 1rem 0.5rem;">~65% Pixel-Hit Rate</td>
+                            <td style="padding: 1rem 0.5rem; font-weight: 600;">~99% Pixel-Hit
+                                Rate</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size: 0.9rem; color: #888; margin-top: 1.5rem; font-style: italic;">Scientific Summary:
+                    The 16.4x density increase (+1,541%) and surface regularization are the primary enablers for stable
+                    open-vocabulary scene understanding from RGB video. (Note: <strong>Pixel-Hit Rate</strong> measures the 
+                    probability of successfully back-projecting 2D mask pixels onto 3D surfaces; a high rate indicates a 
+                    manifold, hole-free reconstruction.)</p>
+            </div>
+        </section>
 
         <!-- LLM Results -->
         <section class="research-block split-view">
@@ -250,7 +348,7 @@ Both items are directly above the workdesk placed side by side.
             </div>
 
             <div class="text-content">
-                <h2>Discussion: Spatial AI Results</h2>
+                <h2>Spatial LLM Reasoning</h2>
                 <p>Unlike traditional active VLM transformers that require massive 3D texturally colored splats and
                     often hallucinate spatial scale, our methodology proved successful by systematically compiling the
                     environment into an ultra-rigid Topological JSON Graph.</p>
