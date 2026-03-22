@@ -1,4 +1,6 @@
-# 3D Semantic Scene Reconstruction & Querying Pipeline
+# 3D Metric-Semantic Scene Reconstruction & Querying Pipeline
+
+[![Blog](https://img.shields.io/badge/Blog-brightgreen?style=for-the-badge&logo=github&logoColor=white)](https://pranavdm99.github.io/3D-metric-semantic-reconstruction/)
 
 An end-to-end computer vision pipeline that converts raw RGB video and ARKit tracking data into a mathematically precise, queryable 3D semantic scene graph.
 
@@ -17,15 +19,15 @@ An end-to-end computer vision pipeline that converts raw RGB video and ARKit tra
 
 ---
 
-**Input Dataset:** Video captured using iPhone 14 in the CamTrackAR app, with frames extracted at 5 FPS. 
+<!-- **Input Dataset:** Video captured using iPhone 14 in the CamTrackAR app, with frames extracted at 5 FPS. 
 
-![Raw Video Frame Overview](docs/assets/frame_0001.jpg)
+![Raw Video Frame Overview](docs/assets/frame_0001.jpg) -->
 
 ## Pipeline Architecture
 
 This project is divided into two primary phases that can be executed via Docker.
 
-![Pipeline Architecture Diagram](docs/assets/architecture_flowchart.png)
+<!-- ![Pipeline Architecture Diagram](docs/assets/architecture_flowchart.png)
 
 > [!CAUTION]
 > **System Hardware Requirements**
@@ -33,7 +35,7 @@ This project is divided into two primary phases that can be executed via Docker.
 > - **GPU**: NVIDIA RTX 4060 (8GB VRAM minimum) 
 > - **RAM**: 16GB System Memory
 > - **Machine**: Dell G15 5530 
-> - **Environment**: Docker Engine w/ NVIDIA Container Toolkit
+> - **Environment**: Docker Engine w/ NVIDIA Container Toolkit -->
 
 ### Phase 1: 3D Reconstruction (`make reconstruction`)
 
