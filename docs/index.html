@@ -161,7 +161,7 @@
                 <h2>Methodology</h2>
                 <p>The system architecture is designed as a modular, feed-forward pipeline that transitions from raw,
                     unstructured RGB video into a structured mathematical 3D scene representation. As visualized in
-                    the flowchart alongside this section, the process begins by simultaneously extracting sparse camera
+                    the architecture flowchart, the process begins by simultaneously extracting sparse camera
                     trajectories through <strong>COLMAP</strong> while performing zero-shot object detection
                     and temporal tracking via <strong>YOLO World and SAM 2</strong>. These parallel tracks are
                     then unified through a <strong>Semantic Loop Closure</strong> algorithm that lifts 2D projections
@@ -291,23 +291,6 @@
         <section id="results" class="research-block text-block-full">
             <h2>Results</h2>
 
-            <!-- Important distinction before quantitative tables -->
-            <div id="trajectory-vs-object" class="text-block-full" style="margin-bottom: 2rem;">
-                <div style="background: rgba(255,180,50,0.1); padding: 2rem;">
-                    <h3 id="trajectory-heading" style="color: #ffbd2e; margin-bottom: 1rem; font-size: 1.2rem;">⚠️ Important distinction: trajectory RMSE ≠ object accuracy</h3>
-                    <p style="margin-bottom: 1rem;">Subsequent validation against ground-truth object dimensions revealed that
-                        <strong>camera trajectory RMSE does not predict object dimension accuracy</strong>. Physical measurements
-                        showed a mean object dimension error of <strong>17.7 cm</strong>, with systematic underestimation across
-                        all measured objects (per-axis breakdown in the dimensional table below).</p>
-                    <p style="margin-bottom: 1rem;">This bias is consistent with incomplete point clouds from partial occlusion and SAM 2 mask
-                        boundary limitations. The system achieves accurate <em>spatial relationships</em> (which objects are near
-                        each other, relative positions) but not precise dimensional metrology (exact object sizes).</p>
-                    <p style="margin: 0;">Many <strong>navigation-style</strong> and <strong>language-grounded</strong> uses depend mainly on
-                        <strong>relationships</strong> and <strong>coarse relative scale</strong> (what is beside what, what reads as larger or farther),
-                        not on <strong>centimeter-exact extents</strong>. That does not make large box errors acceptable for every task:
-                        clearances, fit, fabrication, and similar goals still need tighter geometry than this pipeline targets.</p>
-                </div>
-            </div>
 
             <div id="quantitative-validation" style="background: rgba(255,255,255,0.03); padding: 2rem;">
                 <h3>Quantitative Analysis</h3>
@@ -361,7 +344,7 @@
                     <p style="font-size: 0.95rem; color: #ddd; margin: 0;">
                         <strong style="color: var(--accent1);">Key Insight:</strong> Systems such as ConceptGraphs and HOV-SG
                         <strong>do not report dimensional accuracy</strong>; like this pipeline, they emphasize relational and
-                        navigational semantics over geometric metrology. The object-dimension numbers below contextualize that
+                        navigational semantics over geometric metrology. Those object-dimension measurements contextualize that
                         design choice for depth-sensor-free capture.
                     </p>
                 </div>
@@ -475,10 +458,27 @@
                 </table>
                 <p style="font-size: 0.9rem; color: #888; font-style: italic; margin-bottom: 2rem;">
                     <strong>Mean Absolute Error:</strong> 17.7 cm across 3 objects (9 dimensions), with systematic underprediction
-                    from occlusion and segmentation limits. Trajectory alignment stays tight (see tiles above); object-level error
-                    reflects mask lifting on RGB+IMU without depth. The densification and loop-closure rows above explain how stable
-                    geometry supports that graph.
+                    from occlusion and segmentation limits. Trajectory alignment stays tight at the reported RMSE, while object-level error
+                    reflects mask lifting on RGB+IMU without depth. Dense SuGaR geometry and the loop-closure statistics in the semantic
+                    table explain how stable surfaces still support a large predicate graph despite box drift.
                 </p>
+            </div>
+
+            <div id="trajectory-vs-object" class="text-block-full" style="margin-bottom: 2rem;">
+                <div style="background: rgba(255,180,50,0.1); padding: 2rem;">
+                    <h3 id="trajectory-heading" style="color: #ffbd2e; margin-bottom: 1rem; font-size: 1.2rem;">⚠️ Important distinction: trajectory RMSE ≠ object accuracy</h3>
+                    <p style="margin-bottom: 1rem;">Validation against ground-truth object dimensions revealed that
+                        <strong>camera trajectory RMSE does not equate to object dimension accuracy</strong>. Physical measurements
+                        showed a mean object dimension error of <strong>17.7 cm</strong>, with systematic underestimation across
+                        all measured objects (per-axis breakdown in the physical-dimension validation table).</p>
+                    <p style="margin-bottom: 1rem;">This bias is consistent with incomplete point clouds from partial occlusion and SAM 2 mask
+                        boundary limitations. The system achieves accurate <em>spatial relationships</em> (which objects are near
+                        each other, relative positions) but not precise dimensional metrology (exact object sizes).</p>
+                    <p style="margin: 0;">Many <strong>navigation-style</strong> and <strong>language-grounded</strong> uses depend mainly on
+                        <strong>relationships</strong> and <strong>coarse relative scale</strong> (what is beside what, what reads as larger or farther),
+                        not on <strong>centimeter-exact extents</strong>. That does not make large box errors acceptable for every task:
+                        clearances, fit, fabrication, and similar goals still need tighter geometry than this pipeline targets.</p>
+                </div>
             </div>
 
             <h3 id="results-discussion">Discussion</h3>
@@ -535,21 +535,23 @@
             
             <p style="margin-top: 1rem;">On one bedroom scene, the pipeline shows that <strong>metric alignment and relationship
                 extraction</strong> can coexist with <strong>coarser object dimensions</strong> on consumer hardware without a depth
-                sensor. Cross-paper contrasts (ConceptGraphs, HOV-SG, Semantic Gaussians) and the headline figures are expanded in
-                <strong>Unique Contributions</strong> and <strong>Detailed System Comparison</strong> immediately following this
-                section, so they are not repeated here.</p>
+                sensor. Compared directionally to ConceptGraphs, HOV-SG, and Semantic Gaussians, the clearest contrasts are
+                <strong>input modality</strong> (RGB+IMU vs. RGB-D or heavier stacks), <strong>what each line of work emphasizes</strong>
+                in reported geometry and detection, and <strong>evaluation breadth</strong>—multi-scene benchmarks elsewhere vs.
+                a single capture here, so any headline cell should be read as illustrative until matched protocols exist.</p>
             
             <p style="margin-top: 1.5rem;"><strong>Key Findings (Single Scene):</strong> Strong trajectory alignment to ARKit;
                 useful scene graph and LLM-grounded queries despite dimensional error; SAM 2 fragmentation reduced via loop closure;
-                end-to-end run within 8GB VRAM. Numbers are consolidated under <a href="#quantitative-validation">Results: Quantitative Analysis</a>.</p>
+                end-to-end run within 8GB VRAM.
+                <a href="#quantitative-validation">RMSE, box error, recall, relation counts, and runtime</a> are tabulated for that capture.</p>
             
-            <div style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 2rem;">
+            <!-- <div style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 2rem;">
                 <p style="font-size: 1rem; color: #ddd; margin: 0; line-height: 1.6;">
                     <strong style="color: #ffbd2e;">Critical Future Work:</strong> Multi-scene evaluation is required before
-                    claiming performance bounds or parity with SOTA systems validated on many scenes (see Evaluation Scope in
-                    Overview and the comparison caveat below).
+                    claiming performance bounds or parity with SOTA systems validated on many scenes; until then, headline contrasts
+                    stay <strong>directional</strong> and bound by <strong>single-scene</strong> capture.
                 </p>
-            </div>
+            </div> -->
 
             <!-- <h3 style="color: var(--accent1); margin-top: 2rem;">Impact & Downstream Applications</h3> -->
             <p style="margin-top: 2rem;"><strong>Impact and Applications:</strong> The graph targets tasks where
@@ -586,7 +588,7 @@
                     <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">SOTA: $1,400-2,600 (RGB-D sensor + high-end GPU)<br/>This work: $300 (consumer GPU, phone camera)</p>
                     <div style="background: rgba(16,185,129,0.1); padding: 0.8rem; font-size: 0.85rem; color: #aaa;">
                         <strong style="color: #10b981;">Impact:</strong> Enables accessible spatial AI<br/>
-                        <strong style="color: #ffbd2e;">Tradeoff:</strong> Coarser than RGB-D / LiDAR metrology (see validation tables)
+                        <strong style="color: #ffbd2e;">Tradeoff:</strong> Coarser than RGB-D / LiDAR metrology on the measured objects
                     </div>
                 </div>
                 
@@ -732,8 +734,9 @@
             </div>
             
             <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #ccc;">
-                The table rows summarize modality, semantics, geometry, cost, and evaluation scope; the narrative in
-                <strong>Conclusion</strong> stays qualitative so this block remains the authoritative cross-system view.
+                The grid lines up <strong>modality</strong>, <strong>semantics</strong>, <strong>geometry</strong>,
+                <strong>hardware cost</strong>, and <strong>evaluation scope</strong> so RGB-D-centric assumptions sit next to
+                laptop-scale RGB+IMU figures without implying matched benchmarks.
             </p>
             
             <div style="background: rgba(255,180,50,0.08); padding: 1.5rem; margin-top: 1rem;">
@@ -747,9 +750,9 @@
 
         <section id="limitations" class="research-block text-block-full">
             <h2>Limitations &amp; Explainability</h2>
-            <p>Each limitation below maps to a simple mitigation. The columns assume the same relational use case emphasized
-                in Conclusion and in the <strong>downstream LLM example</strong>; stricter metrology or detection targets imply RGB-D, multi-view capture, or
-                both.</p>
+            <p>Each card pairs an issue with root causes and a mitigation. The framing targets <strong>relational spatial queries</strong>
+                (similar to the downstream LLM demo) rather than high-recall cataloging or ruler-grade sizing; stricter metrology or
+                detection goals imply RGB-D, multi-view capture, or both.</p>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
                 <!-- Dimensional Accuracy -->
@@ -849,13 +852,13 @@ Both items are directly above the workdesk placed side by side.
 
             <div class="text-content">
                 <h2>Downstream example: LLM spatial reasoning</h2>
-                <p class="on-page-nav__lede">This section illustrates <strong>impact and applications</strong>: a simple downstream task built on the exported graph.</p>
-                <p>Unlike traditional active VLM pipelines that rely on massive textured splats and often hallucinate scale,
+                <p class="on-page-nav__lede"><strong>Impact and applications:</strong> a small downstream task on the exported graph—relational questions over explicit predicates rather than dense splat rendering.</p>
+                <p>Unlike traditional active VLM pipelines that rely on massive textured splats and can hallucinate spatial scale,
                     this approach compiles the environment into a structured Topological JSON graph with explicit spatial
                     predicates.</p>
                 <p>The intermediate representation reduces a dense point sample to surface-aligned primitives with metric
                     grounding. When that graph is passed to <strong>Ollama</strong>, the model retrieves relationships and
-                    proximity (e.g. "next to," "directly above," distance estimates), illustrating the intended use case:
+                    proximity (e.g. "next to," "directly above," distance estimates)—a pattern geared toward
                     <strong>relational queries</strong> rather than precise metrology.
                 </p>
             </div>
