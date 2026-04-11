@@ -35,7 +35,14 @@ section[id],
 #results,
 #trajectory-vs-object,
 #results-discussion,
-#downstream-llm-example {
+#downstream-llm-example,
+#evaluation-scope,
+#comparison-caveat,
+#summary-tiles,
+#geometric-reconstruction,
+#semantic-scene-understanding,
+#physical-dimension-accuracy,
+#limitation-panels {
     scroll-margin-top: 4.5rem;
 }
 
