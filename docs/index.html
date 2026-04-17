@@ -59,29 +59,21 @@
                 <div class="tldr__body">
                     <ul class="tldr__list">
                         <li>This page walks through an end-to-end pipeline that starts from <strong>RGB+IMU</strong>
-                            video and ends
-                            with <strong>metric, semantic scene graphs</strong> extracted on consumer-grade GPU, without
-                            an RGB-D sensor.
-                            Geometry comes from COLMAP and SuGaR, semantics from YOLO World and SAM 2, scale from an
-                            ARKit
-                            <strong>Sim(3)</strong> alignment, fragmented instances are merged with <strong>semantic
-                                loop closure</strong>,
-                            and the export is a <strong>predicate scene graph</strong> you can query.
+                            video and ends with <strong>metric, semantic scene graphs</strong> extracted on
+                            consumer-grade GPU, without any depth sensors. Geometry comes from COLMAP and SuGaR,
+                            semantics from YOLO World and SAM 2, scale from an ARKit <strong>Sim(3)</strong> alignment,
+                            fragmented instances are merged with <strong>semantic loop closure</strong>, and the export
+                            is a <strong>predicate scene graph</strong> you can query.
                         </li>
                         <li>Every quantitative result is anchored to <strong>one bedroom scene</strong>. In that setting
-                            the camera
-                            trajectory aligns tightly with ARKit, while object bounding boxes drift by tens of
-                            centimeters on average—an
-                            expected cost of lifting masks without depth. Still, the same reconstruction supports dense
-                            mask lifting,
-                            <strong>156</strong> typed spatial relations, and a small <strong>downstream LLM</strong>
+                            the camera trajectory aligns tightly with ARKit, while object bounding boxes drift by tens
+                            of centimeters on average—an expected cost of lifting masks without depth. Still, the same
+                            reconstruction supports dense mask lifting, <strong>156</strong> typed spatial relations,
+                            and a small <strong>downstream LLM</strong>
                             example.
                         </li>
-                        <li>Overall, this work is about <strong>feasibility on the accessibility–precision
-                                frontier</strong>: strong
-                            relational layout and laptop-scale cost, with metrology that stays closer to “good enough
-                            for graphs and
-                            queries” than to RGB-D-class sizing.</li>
+                        <li>Overall, this work is about feasibility of getting strong relational layout from a laptop,
+                            even if object sizes are imprecise compared to RGB-D or LiDAR-based methods.</li>
                     </ul>
                 </div>
             </details>
@@ -93,34 +85,24 @@
                 <h2>Overview</h2>
                 <p style="font-size:1.15rem; color:#fff; font-weight: 400; margin-bottom: 1.5rem; line-height: 1.6;">
                     This project presents a <strong>proof-of-concept system</strong> that extracts metric-scale semantic
-                    scene graphs from
-                    RGB+IMU video on consumer hardware. Unlike existing approaches (ConceptGraphs, HOV-SG) that require
-                    RGB-D
-                    sensors and high-end GPUs, this system achieves spatial relationship understanding from monocular
-                    RGB with
-                    inertial sensor data on an 8GB laptop GPU.</p>
+                    scene graphs from RGB+IMU video on consumer hardware. Unlike existing approaches (ConceptGraphs,
+                    HOV-SG) that require RGB-D sensors and high-end GPUs, this system achieves spatial relationship
+                    understanding from monocular RGB with inertial sensor data on an 8GB laptop GPU.</p>
 
                 <p style="font-size:1.05rem; color:#ccc;">The system combines <strong>3D Gaussian Splatting</strong>
-                    (SuGaR)
-                    for dense surface reconstruction, <strong>open-vocabulary detection</strong> (YOLO World + SAM 2)
-                    for semantic
-                    understanding, and <strong>ARKit IMU alignment</strong> for metric scale recovery. By using
-                    monocular RGB with
-                    inertial sensors instead of depth sensors, this unique combination enables scene graph extraction on
-                    consumer
-                    hardware, though at the cost of dimensional precision.</p>
+                    (SuGaR) for dense surface reconstruction, <strong>open-vocabulary detection</strong> (YOLO World +
+                    SAM 2) for semantic understanding, and <strong>ARKit IMU alignment</strong> for metric scale
+                    recovery. By using monocular RGB with inertial sensors instead of depth sensors, this unique
+                    combination enables scene graph extraction on consumer hardware, though at the cost of dimensional
+                    precision.</p>
                 <div id="evaluation-scope"
                     style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 1.5rem;">
                     <p style="font-size: 0.95rem; color: #ddd; margin: 0; line-height: 1.6;">
                         <strong style="color: #ffbd2e; font-size: 1rem;">⚠️ Evaluation Scope:</strong> This work
-                        presents
-                        <strong>single-scene validation</strong> on a representative bedroom environment. All reported
-                        metrics
-                        are specific to this scene and may not generalize. While single-scene evaluation limits
-                        generalization claims,
-                        these results <strong>establish feasibility</strong> and identify key accessibility-precision
-                        tradeoffs for
-                        future multi-scene investigation.
+                        presents <strong>single-scene validation</strong> on a representative bedroom environment. All
+                        reported metrics are specific to this scene and may not generalize. While single-scene
+                        evaluation limits generalization claims, these results <strong>establish feasibility</strong>
+                        and identify key accessibility-precision tradeoffs for future multi-scene investigation.
                     </p>
                 </div>
             </div>
