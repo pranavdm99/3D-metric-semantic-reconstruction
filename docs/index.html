@@ -17,8 +17,8 @@
     <header class="hero" id="top">
         <div class="glass-nav">
             <h2 class="logo">Scene Recon<span style="color:var(--accent1)">.</span></h2>
-            <a href="https://github.com/pranavdm99/3D-metric-semantic-reconstruction" class="github-btn"
-                target="_blank" rel="noopener noreferrer"> <strong>View on GitHub </strong></a>
+            <a href="https://github.com/pranavdm99/3D-metric-semantic-reconstruction" class="github-btn" target="_blank"
+                rel="noopener noreferrer"> <strong>View on GitHub </strong></a>
         </div>
 
         <div class="article-hero">
@@ -31,7 +31,8 @@
             </div>
 
             <p class="article-hero__deck">
-                Dense 3D surfaces, fused detections, and queryable spatial relations from <strong>RGB+IMU</strong> alone. No depth camera, no datacenter GPU.
+                Dense 3D surfaces, fused detections, and queryable spatial relations from <strong>RGB+IMU</strong>
+                alone. No depth camera, no datacenter GPU.
             </p>
 
             <ul class="article-hero__tags" aria-label="Highlights">
@@ -49,22 +50,37 @@
                 <summary class="tldr__summary">
                     <span class="tldr__summary-title">Quick summary</span>
                     <span class="tldr__chevron" aria-hidden="true">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 9l6 6 6-6" />
+                        </svg>
                     </span>
                 </summary>
                 <div class="tldr__body">
                     <ul class="tldr__list">
-                        <li>This page walks through an end-to-end pipeline that starts from <strong>RGB+IMU</strong> video and ends
-                            with <strong>metric, semantic scene graphs</strong> extracted on consumer-grade GPU, without an RGB-D sensor.
-                            Geometry comes from COLMAP and SuGaR, semantics from YOLO World and SAM 2, scale from an ARKit
-                            <strong>Sim(3)</strong> alignment, fragmented instances are merged with <strong>semantic loop closure</strong>,
-                            and the export is a <strong>predicate scene graph</strong> you can query.</li>
-                        <li>Every quantitative result is anchored to <strong>one bedroom scene</strong>. In that setting the camera
-                            trajectory aligns tightly with ARKit, while object bounding boxes drift by tens of centimeters on average—an
-                            expected cost of lifting masks without depth. Still, the same reconstruction supports dense mask lifting,
-                            <strong>156</strong> typed spatial relations, and a small <strong>downstream LLM</strong> example.</li>
-                        <li>Overall, this work is about <strong>feasibility on the accessibility–precision frontier</strong>: strong
-                            relational layout and laptop-scale cost, with metrology that stays closer to “good enough for graphs and
+                        <li>This page walks through an end-to-end pipeline that starts from <strong>RGB+IMU</strong>
+                            video and ends
+                            with <strong>metric, semantic scene graphs</strong> extracted on consumer-grade GPU, without
+                            an RGB-D sensor.
+                            Geometry comes from COLMAP and SuGaR, semantics from YOLO World and SAM 2, scale from an
+                            ARKit
+                            <strong>Sim(3)</strong> alignment, fragmented instances are merged with <strong>semantic
+                                loop closure</strong>,
+                            and the export is a <strong>predicate scene graph</strong> you can query.
+                        </li>
+                        <li>Every quantitative result is anchored to <strong>one bedroom scene</strong>. In that setting
+                            the camera
+                            trajectory aligns tightly with ARKit, while object bounding boxes drift by tens of
+                            centimeters on average—an
+                            expected cost of lifting masks without depth. Still, the same reconstruction supports dense
+                            mask lifting,
+                            <strong>156</strong> typed spatial relations, and a small <strong>downstream LLM</strong>
+                            example.
+                        </li>
+                        <li>Overall, this work is about <strong>feasibility on the accessibility–precision
+                                frontier</strong>: strong
+                            relational layout and laptop-scale cost, with metrology that stays closer to “good enough
+                            for graphs and
                             queries” than to RGB-D-class sizing.</li>
                     </ul>
                 </div>
@@ -76,22 +92,34 @@
             <div class="text-content">
                 <h2>Overview</h2>
                 <p style="font-size:1.15rem; color:#fff; font-weight: 400; margin-bottom: 1.5rem; line-height: 1.6;">
-                    This project presents a <strong>proof-of-concept system</strong> that extracts metric-scale semantic scene graphs from 
-                    RGB+IMU video on consumer hardware. Unlike existing approaches (ConceptGraphs, HOV-SG) that require RGB-D 
-                    sensors and high-end GPUs, this system achieves spatial relationship understanding from monocular RGB with 
+                    This project presents a <strong>proof-of-concept system</strong> that extracts metric-scale semantic
+                    scene graphs from
+                    RGB+IMU video on consumer hardware. Unlike existing approaches (ConceptGraphs, HOV-SG) that require
+                    RGB-D
+                    sensors and high-end GPUs, this system achieves spatial relationship understanding from monocular
+                    RGB with
                     inertial sensor data on an 8GB laptop GPU.</p>
-                
-                <p style="font-size:1.05rem; color:#ccc;">The system combines <strong>3D Gaussian Splatting</strong> (SuGaR) 
-                    for dense surface reconstruction, <strong>open-vocabulary detection</strong> (YOLO World + SAM 2) for semantic 
-                    understanding, and <strong>ARKit IMU alignment</strong> for metric scale recovery. By using monocular RGB with 
-                    inertial sensors instead of depth sensors, this unique combination enables scene graph extraction on consumer 
+
+                <p style="font-size:1.05rem; color:#ccc;">The system combines <strong>3D Gaussian Splatting</strong>
+                    (SuGaR)
+                    for dense surface reconstruction, <strong>open-vocabulary detection</strong> (YOLO World + SAM 2)
+                    for semantic
+                    understanding, and <strong>ARKit IMU alignment</strong> for metric scale recovery. By using
+                    monocular RGB with
+                    inertial sensors instead of depth sensors, this unique combination enables scene graph extraction on
+                    consumer
                     hardware, though at the cost of dimensional precision.</p>
-                <div id="evaluation-scope" style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 1.5rem;">
+                <div id="evaluation-scope"
+                    style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 1.5rem;">
                     <p style="font-size: 0.95rem; color: #ddd; margin: 0; line-height: 1.6;">
-                        <strong style="color: #ffbd2e; font-size: 1rem;">⚠️ Evaluation Scope:</strong> This work presents 
-                        <strong>single-scene validation</strong> on a representative bedroom environment. All reported metrics 
-                        are specific to this scene and may not generalize. While single-scene evaluation limits generalization claims, 
-                        these results <strong>establish feasibility</strong> and identify key accessibility-precision tradeoffs for 
+                        <strong style="color: #ffbd2e; font-size: 1rem;">⚠️ Evaluation Scope:</strong> This work
+                        presents
+                        <strong>single-scene validation</strong> on a representative bedroom environment. All reported
+                        metrics
+                        are specific to this scene and may not generalize. While single-scene evaluation limits
+                        generalization claims,
+                        these results <strong>establish feasibility</strong> and identify key accessibility-precision
+                        tradeoffs for
                         future multi-scene investigation.
                     </p>
                 </div>
@@ -104,8 +132,7 @@
                 <div class="gallery-wrapper" style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap;">
                     <div class="img-wrapper"
                         style="box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 150px;">
-                        <img src="assets/sfm_visual.png" alt="SfM & Geometry"
-                            style="width: 100%; height: auto;">
+                        <img src="assets/sfm_visual.png" alt="SfM & Geometry" style="width: 100%; height: auto;">
                     </div>
                     <div class="img-wrapper"
                         style="box-shadow: 0 25px 60px rgba(0,0,0,0.7); flex: 1; min-width: 150px;">
@@ -166,13 +193,12 @@
                     then unified through a <strong>Semantic Loop Closure</strong> algorithm that lifts 2D projections
                     into a metric-aligned 3D SuGaR surface, finally yielding the queryable <strong>Topological Scene
                         Graph</strong>.</p>
-                <p><strong>Hardware & VRAM Engineering:</strong> Implementing this monolithic flow on consumer-grade
-                    hardware (<strong>Dell G15: 16 GB RAM, RTX 4060 8GB VRAM</strong>) required significant engineering
-                    pivots. The pipeline forcibly decouples the geometric and semantic processing stages to prevent cumulative
-                    memory fragmentation during training. Furthermore, runtime logic patches for the SuGaR
-                    <code>CamerasWrapper</code> modules enable dynamic resolution rescaling and hyper-parameter
-                    downscales to maintain high surface fidelity within a containerized, 8GB-constrained compute
-                    footprint.
+                <p><strong>Hardware & VRAM Engineering:</strong> Implementing this pipeline on a consumer GPU required
+                    separating the geometry and semantic stages to stay within VRAM limits. The pipeline decouples the
+                    geometric and semantic processing stages to prevent cumulative memory fragmentation during training.
+                    Furthermore, runtime logic patches for the SuGaR <code>CamerasWrapper</code> modules enable dynamic
+                    resolution rescaling and hyper-parameter downscales to maintain high surface fidelity on an 8 GB
+                    GPU.
                 </p>
             </div>
             <div class="visuals single-visual">
@@ -186,15 +212,15 @@
         <section id="surface-reconstruction" class="research-block split-view reverse">
             <div class="text-content">
                 <h2>3D Surface Reconstruction</h2>
-                <p>Testing on a 59-second video shot at 30 FPS, we decimated the temporal sequence down to 5 FPS
-                    (yielding ~295 working frames). The pipeline processes these frames through <strong>COLMAP</strong>
+                <p>Testing on a 59-second video shot at 30 FPS, we down-sampled to 5 FPS
+                    (~295 total frames). The pipeline processes these frames through <strong>COLMAP</strong>
                     Structure-from-Motion (SfM) to estimate initial sparse camera posings.</p>
                 <p>To achieve continuous physical geometry within constrained 8GB VRAM limits, we aggressively
                     downscaled images globally (`factor=2`) and resolution (`factor=4`). After just <strong>15 minutes
                         of training</strong>, vanilla 3DGS peaked at approximately <strong>1.4 million
                         Gaussians</strong>. The <strong>SuGaR</strong> algorithm then rigorously optimized and pruned
-                    this surface down to a highly-refined, mesh-aligned cloud containing exactly <strong>303,738
-                        pristine 3D splats</strong>.</p>
+                    this surface down to a refined cloud containing <strong>303,738 3D
+                        Gaussian splats</strong>.</p>
             </div>
             <div class="visuals triple-visual">
                 <div class="img-wrapper"><img src="assets/input.gif" alt="Raw Input Sequence">
@@ -213,16 +239,13 @@
         <section id="semantic-loop-closure" class="research-block split-view">
             <div class="text-content">
                 <h2>Semantic Loop Closure</h2>
-                <p>Decoupled from 3D splatting and operating natively in 2D space, we utilize <strong>YOLO
-                        World</strong> and <strong>SAM 2</strong> to perform zero-shot segmentation and temporal mask
-                    tracking across the heavily down-sampled image sequence.</p>
-                <p>Because temporal tracking masks frequently shatter across visual occlusions (e.g., separating a bed
-                    into <code>bed_1</code> vs <code>bed_2</code>), we <strong>implement</strong> a mathematical
-                    <strong>Semantic Loop
-                        Closure</strong> technique. By lifting masks into the metric 3D cloud, we autonomously merge
-                    fragmented
-                    point clouds of identical string-classes if their 3D Euclidean bounding boxes fall within tight
-                    metric proximities.
+                <p>We use <strong>YOLO World</strong> and <strong>SAM 2</strong> to perform zero-shot segmentation and
+                    temporal mask tracking across the video feed. Because temporal tracking masks frequently shatter
+                    across visual occlusions (e.g., separating a bed
+                    into <code>bed_1</code> vs <code>bed_2</code>), we <strong>implement</strong> a
+                    <strong>Semantic Loop Closure</strong> technique. By lifting masks into the metric 3D cloud, we
+                    autonomously merge fragmented point clouds of identical string-classes if their 3D Euclidean
+                    bounding boxes fall within tight metric proximities.
                 </p>
             </div>
             <div class="visuals double-visual">
@@ -239,9 +262,9 @@
         <section id="metric-scale" class="research-block split-view reverse">
             <div class="text-content">
                 <h2>Metric Scale Recovery</h2>
-                <p>Because vanilla COLMAP reconstructions are strictly dimensionless logic puzzles, the pipeline extracts the
-                    hardware iOS ARKit IMU trajectory natively associated with the video bounds. The system rigidly aligns the
-                    two flight paths using an optimized <strong>Sim(3) transformation matrix</strong>.</p>
+                <p>Because vanilla COLMAP reconstructions are strictly dimensionless, the pipeline extracts the hardware
+                    iOS ARKit IMU trajectory natively associated with the video bounds. The system rigidly aligns the
+                    two camera trajectories using an optimized <strong>Sim(3) transformation matrix</strong>.</p>
                 <div
                     style="background: rgba(0,0,0,0.4); padding: 1.5rem; margin-bottom: 1.5rem; color: #fff; font-size: 1.1rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
                     $$ \mathbf{p}' = s \mathbf{R} \mathbf{p} + \mathbf{t} $$
@@ -251,11 +274,11 @@
                     \mathbf{R} \) is the proper \( 3 \times 3 \) rotational alignment, and \( \mathbf{t} \) is the \( 3
                     \times 1 \) translation vector mapping origin-to-origin yielding the absolute physical ARKit
                     coordinate \( \mathbf{p}' \).</p>
-                <p>By enforcing this structural matrix over the entire point cloud, the scene forcefully snaps directly
-                    into real-world physical meters. Using COLMAP's <code>model_aligner</code> with robust alignment
+                <p>Applying this transformation over the entire point cloud scales the reconstruction to metric units.
+                    Using COLMAP's <code>model_aligner</code> with robust alignment
                     enabled, the system achieves a trajectory alignment <strong>RMSE of 1.83 cm</strong> between the
                     reconstructed camera path and ARKit ground-truth across 291 frames, confirming the camera trajectory
-                    remains rigorously grounded in metric space.</p>
+                    remains in metric space.</p>
             </div>
             <div class="visuals single-visual">
                 <div class="img-wrapper"><img src="assets/trajectory_plot.png" alt="ARKit Alignment">
@@ -268,15 +291,17 @@
         <section id="scene-graph" class="research-block split-view">
             <div class="text-content">
                 <h2>Topological Scene Graph</h2>
-                <p>Once the scene is structurally snapped into true metric vectors, the system computes physical <strong>Oriented
-                        Bounding Boxes (OBBs)</strong> for all discrete semantic entities produced by mask lifting and loop closure. By
-                    executing Principal Component Analysis (PCA) strictly along the gravity-aligned XZ floor plane, the algorithm
-                    cleanly eliminates any bounding-box skew distortions across tall geometries like doors and wardrobes.
+                <p>Once the scene is transformed to metric space, the system computes physical
+                    <strong>Oriented
+                        Bounding Boxes (OBBs)</strong> for all discrete semantic entities produced by mask lifting and
+                    loop closure. By executing Principal Component Analysis (PCA) strictly along the XZ (floor) plane,
+                    the algorithm removes any bounding-box skews across tall geometries like doors and
+                    wardrobes.
                 </p>
-                <p>These rigid arrays are evaluated against localized mathematical interaction algorithms to extract
-                    explicit geometry predicates (e.g., <code>resting_on</code>, <code>directly_above</code>,
-                    <code>next_to</code>). This outputs the formalized node-edge Topology Graph that ultimately bridges 3D
-                    mechanics to standard NLP querying.
+                <p>We then compute pairwise spatial predicates (e.g., <code>resting_on</code>,
+                    <code>directly_above</code>, <code>next_to</code>) based on bounding box proximity and overlap. This
+                    outputs the formalized node-edge Topology Graph that ultimately bridges 3D mechanics to standard NLP
+                    querying.
                 </p>
             </div>
             <div class="visuals single-visual">
@@ -296,41 +321,56 @@
                 <p style="font-size: 0.95rem; color: #aaa; margin: 0 0 1.25rem 0; text-align: center;">
                     Summary tiles and tables (including SOTA references where available).
                 </p>
-                
-                <div id="summary-tiles" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+
+                <div id="summary-tiles"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                     <!-- Trajectory RMSE -->
-                    <div style="background: linear-gradient(135deg, rgba(100,200,255,0.15) 0%, rgba(100,200,255,0.05) 100%); padding: 1.5rem;">
-                        <div style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Camera Trajectory</div>
-                        <div style="font-size: 2rem; font-weight: 700; color: var(--accent1); margin-bottom: 0.3rem;">1.83 cm</div>
+                    <div
+                        style="background: linear-gradient(135deg, rgba(100,200,255,0.15) 0%, rgba(100,200,255,0.05) 100%); padding: 1.5rem;">
+                        <div
+                            style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                            Camera Trajectory</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--accent1); margin-bottom: 0.3rem;">
+                            1.83 cm</div>
                         <div style="font-size: 0.9rem; color: #ccc;">RMSE vs. ARKit (291 frames)</div>
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; font-size: 0.85rem; color: #aaa;">
                             ConceptGraphs: <span style="color: #888;">Not reported</span>
                         </div>
                     </div>
-                    
+
                     <!-- Dimensional Error -->
-                    <div style="background: linear-gradient(135deg, rgba(255,150,100,0.15) 0%, rgba(255,150,100,0.05) 100%); padding: 1.5rem;">
-                        <div style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Object Dimensions</div>
-                        <div style="font-size: 2rem; font-weight: 700; color: #ffbd2e; margin-bottom: 0.3rem;">17.7 cm</div>
+                    <div
+                        style="background: linear-gradient(135deg, rgba(255,150,100,0.15) 0%, rgba(255,150,100,0.05) 100%); padding: 1.5rem;">
+                        <div
+                            style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                            Object Dimensions</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: #ffbd2e; margin-bottom: 0.3rem;">17.7 cm
+                        </div>
                         <div style="font-size: 0.9rem; color: #ccc;">Mean error (depth-sensor-free tradeoff)</div>
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; font-size: 0.85rem; color: #aaa;">
                             ConceptGraphs: <span style="color: #888;">Not reported</span>
                         </div>
                     </div>
-                    
+
                     <!-- Semantic Accuracy -->
-                    <div style="background: linear-gradient(135deg, rgba(200,100,255,0.15) 0%, rgba(200,100,255,0.05) 100%); padding: 1.5rem;">
-                        <div style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Object Detection</div>
+                    <div
+                        style="background: linear-gradient(135deg, rgba(200,100,255,0.15) 0%, rgba(200,100,255,0.05) 100%); padding: 1.5rem;">
+                        <div
+                            style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                            Object Detection</div>
                         <div style="font-size: 2rem; font-weight: 700; color: #a855f7; margin-bottom: 0.3rem;">52%</div>
                         <div style="font-size: 0.9rem; color: #ccc;">Recall (13/25 classes)</div>
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; font-size: 0.85rem; color: #aaa;">
                             ConceptGraphs: <span style="color: #ddd; font-weight: 600;">71%</span>
                         </div>
                     </div>
-                    
+
                     <!-- Relationships -->
-                    <div style="background: linear-gradient(135deg, rgba(100,255,200,0.15) 0%, rgba(100,255,200,0.05) 100%); padding: 1.5rem;">
-                        <div style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Scene Graph</div>
+                    <div
+                        style="background: linear-gradient(135deg, rgba(100,255,200,0.15) 0%, rgba(100,255,200,0.05) 100%); padding: 1.5rem;">
+                        <div
+                            style="font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">
+                            Scene Graph</div>
                         <div style="font-size: 2rem; font-weight: 700; color: #10b981; margin-bottom: 0.3rem;">156</div>
                         <div style="font-size: 0.9rem; color: #ccc;">Spatial relationships (9 types)</div>
                         <div style="margin-top: 0.8rem; padding-top: 0.8rem; font-size: 0.85rem; color: #aaa;">
@@ -338,30 +378,40 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div style="background: rgba(100,150,255,0.08); padding: 1.5rem; margin-bottom: 2rem;">
                     <p style="font-size: 0.95rem; color: #ddd; margin: 0;">
-                        <strong style="color: var(--accent1);">Key Insight:</strong> Systems such as ConceptGraphs and HOV-SG
-                        <strong>do not report dimensional accuracy</strong>; like this pipeline, they emphasize relational and
+                        <strong style="color: var(--accent1);">Key Insight:</strong> Systems such as ConceptGraphs and
+                        HOV-SG
+                        <strong>do not report dimensional accuracy</strong>; like this pipeline, they emphasize
+                        relational and
                         navigational semantics over geometric metrology. The
-                        <a href="#physical-dimension-accuracy">object-dimension numbers in the table below</a> contextualize that
+                        <a href="#physical-dimension-accuracy">object-dimension numbers in the table below</a>
+                        contextualize that
                         design choice for depth-sensor-free capture.
                     </p>
                 </div>
-                
+
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
                     <div style="background: rgba(100,255,200,0.1); padding: 1.2rem; text-align: center;">
-                        <div style="font-size: 0.9rem; color: #10b981; font-weight: 600; margin-bottom: 0.3rem;">✓ SUITABLE FOR</div>
-                        <div style="font-size: 0.9rem; color: #ccc;">Spatial understanding • Relationship reasoning • Robotics navigation</div>
+                        <div style="font-size: 0.9rem; color: #10b981; font-weight: 600; margin-bottom: 0.3rem;">✓
+                            SUITABLE FOR</div>
+                        <div style="font-size: 0.9rem; color: #ccc;">Spatial understanding • Relationship reasoning •
+                            Robotics navigation</div>
                     </div>
                     <div style="background: rgba(255,100,100,0.1); padding: 1.2rem; text-align: center;">
-                        <div style="font-size: 0.9rem; color: #ff6b6b; font-weight: 600; margin-bottom: 0.3rem;">✗ NOT SUITABLE FOR</div>
-                        <div style="font-size: 0.9rem; color: #ccc;">Precision metrology • Dimensional measurement • CAD modeling</div>
+                        <div style="font-size: 0.9rem; color: #ff6b6b; font-weight: 600; margin-bottom: 0.3rem;">✗ NOT
+                            SUITABLE FOR</div>
+                        <div style="font-size: 0.9rem; color: #ccc;">Precision metrology • Dimensional measurement • CAD
+                            modeling</div>
                     </div>
                 </div>
 
-                <h3 id="geometric-reconstruction" style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--accent1);">Geometric Reconstruction Quality</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 2rem;">
+                <h3 id="geometric-reconstruction"
+                    style="font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 1rem; color: var(--accent1);">Geometric
+                    Reconstruction Quality</h3>
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 2rem;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border); text-align: left;">
                             <th style="padding: 1rem 0.5rem;">Metric</th>
@@ -395,8 +445,11 @@
                     </tbody>
                 </table>
 
-                <h3 id="semantic-scene-understanding" style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent1);">Semantic Scene Understanding</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 2rem;">
+                <h3 id="semantic-scene-understanding"
+                    style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent1);">Semantic Scene Understanding
+                </h3>
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 2rem;">
                     <tbody>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem 0.5rem;">Target Object Classes</td>
@@ -412,7 +465,8 @@
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem 0.5rem;">Fragmentation Reduction</td>
-                            <td style="padding: 1rem 0.5rem; font-weight: 600; color: var(--accent1);">45.8% fewer fragments</td>
+                            <td style="padding: 1rem 0.5rem; font-weight: 600; color: var(--accent1);">45.8% fewer
+                                fragments</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                             <td style="padding: 1rem 0.5rem;">Segmented 3D Points</td>
@@ -425,8 +479,11 @@
                     </tbody>
                 </table>
 
-                <h3 id="physical-dimension-accuracy" style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent1);">Physical Dimension Accuracy</h3>
-                <table style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 1rem;">
+                <h3 id="physical-dimension-accuracy"
+                    style="font-size: 1.1rem; margin-bottom: 1rem; color: var(--accent1);">Physical Dimension Accuracy
+                </h3>
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 1rem; color: #ccc; margin-bottom: 1rem;">
                     <thead>
                         <tr style="border-bottom: 1px solid var(--border); text-align: left;">
                             <th style="padding: 1rem 0.5rem;">Object</th>
@@ -457,7 +514,8 @@
                     </tbody>
                 </table>
                 <p style="font-size: 0.9rem; color: #888; font-style: italic; margin-bottom: 2rem;">
-                    <strong>Mean Absolute Error:</strong> 17.7 cm across 3 objects (9 dimensions), with systematic underprediction
+                    <strong>Mean Absolute Error:</strong> 17.7 cm across 3 objects (9 dimensions), with systematic
+                    underprediction
                     from occlusion and segmentation limits. Trajectory alignment stays tight in the
                     <a href="#summary-tiles">summary tiles</a>; object-level error
                     reflects mask lifting on RGB+IMU without depth. The
@@ -468,19 +526,30 @@
             </div>
             <div id="trajectory-vs-object" class="text-block-full" style="margin-bottom: 2rem;">
                 <div style="background: rgba(255,180,50,0.1); padding: 2rem;">
-                    <h3 id="trajectory-heading" style="color: #ffbd2e; margin-bottom: 1rem; font-size: 1.2rem;">⚠️ Important distinction: trajectory RMSE ≠ object accuracy</h3>
+                    <h3 id="trajectory-heading" style="color: #ffbd2e; margin-bottom: 1rem; font-size: 1.2rem;">⚠️
+                        Important distinction: trajectory RMSE ≠ object accuracy</h3>
                     <p style="margin-bottom: 1rem;">Validation against ground-truth object dimensions revealed that
-                        <strong>camera trajectory RMSE does not equate to object dimension accuracy</strong>. Physical measurements
-                        showed a mean object dimension error of <strong>17.7 cm</strong>, with systematic underestimation across
+                        <strong>camera trajectory RMSE does not equate to object dimension accuracy</strong>. Physical
+                        measurements
+                        showed a mean object dimension error of <strong>17.7 cm</strong>, with systematic
+                        underestimation across
                         all measured objects (per-axis breakdown in the
-                        <a href="#physical-dimension-accuracy">physical-dimension validation table</a>).</p>
-                    <p style="margin-bottom: 1rem;">This bias is consistent with incomplete point clouds from partial occlusion and SAM 2 mask
-                        boundary limitations. The system achieves accurate <em>spatial relationships</em> (which objects are near
+                        <a href="#physical-dimension-accuracy">physical-dimension validation table</a>).
+                    </p>
+                    <p style="margin-bottom: 1rem;">This bias is consistent with incomplete point clouds from partial
+                        occlusion and SAM 2 mask
+                        boundary limitations. The system achieves accurate <em>spatial relationships</em> (which objects
+                        are near
                         each other, relative positions) but not precise dimensional metrology (exact object sizes).</p>
-                    <p style="margin: 0;">Many <strong>navigation-style</strong> and <strong>language-grounded</strong> uses depend mainly on
-                        <strong>relationships</strong> and <strong>coarse relative scale</strong> (what is beside what, what reads as larger or farther),
-                        not on <strong>centimeter-exact extents</strong>. That does not make large box errors acceptable for every task:
-                        clearances, fit, fabrication, and similar goals still need tighter geometry than this pipeline targets.</p>
+                    <p style="margin: 0;">Many <strong>navigation-style</strong> and <strong>language-grounded</strong>
+                        uses depend mainly on
+                        <strong>relationships</strong> and <strong>coarse relative scale</strong> (what is beside what,
+                        what reads as larger or farther),
+                        not on <strong>centimeter-exact extents</strong>. That does not make large box errors acceptable
+                        for every task:
+                        clearances, fit, fabrication, and similar goals still need tighter geometry than this pipeline
+                        targets.
+                    </p>
                 </div>
             </div>
 
@@ -490,33 +559,24 @@
             <div class="split-view" style="margin-bottom: 3rem; align-items: start;">
                 <div class="text-content">
                     <h4>Sparse vs. surface-aligned geometry</h4>
-                    <p>A careful audit of the raw structure-from-motion outputs reveals a fundamental limitation of
-                        traditional feature-tracking.
-                        The point distribution in <strong>COLMAP (SIFT)</strong> is extremely sparse and almost
-                        exclusively
-                        concentrated along <strong>high-contrast edges and texture boundaries</strong>. While this is
-                        SIFT performing exactly as designed, it leaves the central surfaces of objects (desks, monitors,
-                        doors)
-                        geometrically empty.</p>
-                    <p>By contrast, <strong>SuGaR</strong> does not merely "densify" the cloud. It introduces critical
-                        <strong>surface regularization</strong> during the refinement stage. This ensures that Gaussians
-                        are mathematically pulled onto the actual manifold geometry of the scene, preventing the
-                        "floating splat" artifacts common in vanilla 3DGS and providing a continuous substrate for
-                        robust 3D semantic mask-lifting.
+                    <p>The raw COLMAP point cloud is sparse and concentrated along texture edges, as expected from SIFT.
+                        However, it leaves the central surfaces of objects geometrically empty.
+                    </p>
+                    <p>In contrast, SuGaR’s surface regularization pulls Gaussians toward the true scene manifold during
+                        the refinement stage. This prevents floating splats common in vanilla 3DGS and provides a
+                        continuous substrate for robust 3D semantic mask-lifting.
                     </p>
                 </div>
                 <div class="visuals single-visual">
                     <div class="visuals double-visual" style="margin-bottom: 1rem; gap: 1rem;">
-                        <div class="img-wrapper"
-                            style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <div class="img-wrapper" style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                             <img src="assets/points_colmap_work_area.png" alt="COLMAP Sparse Points"
                                 style="width: 100%; height: auto;">
                             <div class="caption"
                                 style="background: rgba(0,0,0,0.7); padding: 0.5rem; font-size: 0.8rem;">COLMAP:
                                 Edge-Based Sparse (18k pts)</div>
                         </div>
-                        <div class="img-wrapper"
-                            style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <div class="img-wrapper" style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
                             <img src="assets/points_3dgs_segmented_work_area.png" alt="SuGaR Semantic Splats"
                                 style="width: 100%; height: auto;">
                             <div class="caption"
@@ -531,13 +591,20 @@
         <!-- Full Width Final Sections -->
         <section id="conclusion" class="research-block text-block-full">
             <h2>Conclusion</h2>
-            
+
             <p style="font-size: 1.1rem; color: #ddd; font-weight: 400; margin-bottom: 1.5rem;">
                 <!-- This project presents a <strong>proof-of-concept system</strong> demonstrating the feasibility of extracting semantic 
                 scene graphs from RGB+IMU on consumer hardware without specialized depth sensors. -->
-                Metric scene graphs from RGB+IMU on consumer hardware are feasible. Camera alignment is tight, relational queries work, but object dimensions drift. That is an expected cost of lifting masks without depth.
+                Metric scene graphs from RGB+IMU on consumer hardware are feasible. Camera alignment is tight,
+                relational queries work, but object dimensions drift. That is an expected cost of lifting masks without
+                depth.
             </p>
-            <p style="margin-top: 1.5rem;">To summarize, this pipeline demonstrates that metric alignment and relationship extraction can operate on consumer hardware without a depth sensor even with coarse object dimensions. It achieves strong trajectory alignment with ARKit, outputs useful scene graphs and LLM-grounded queries despite dimensional errors, reduces SAM 2 fragmentation through loop closure, and runs end-to-end within 8GB VRAM. Quantitative results are summarized in the <a href="#results">Results</a> section.</p>
+            <p style="margin-top: 1.5rem;">To summarize, this pipeline demonstrates that metric alignment and
+                relationship extraction can operate on consumer hardware without a depth sensor even with coarse object
+                dimensions. It achieves strong trajectory alignment with ARKit, outputs useful scene graphs and
+                LLM-grounded queries despite dimensional errors, reduces SAM 2 fragmentation through loop closure, and
+                runs end-to-end within 8GB VRAM. Quantitative results are summarized in the <a
+                    href="#results">Results</a> section.</p>
             <!-- <div style="background: rgba(255,180,50,0.1); padding: 1.5rem; margin-top: 2rem;">
                 <p style="font-size: 1rem; color: #ddd; margin: 0; line-height: 1.6;">
                     <strong style="color: #ffbd2e;">Critical Future Work:</strong> Multi-scene evaluation is required before
@@ -547,14 +614,19 @@
 
             <!-- <h3 style="color: var(--accent1); margin-top: 2rem;">Impact & Downstream Applications</h3> -->
             <p style="margin-top: 2rem;"><strong>Impact and Applications:</strong> The graph targets tasks where
-                <strong>relative layout</strong> matters more than sub-centimeter sizing:</p>
+                <strong>relative layout</strong> matters more than sub-centimeter sizing:
+            </p>
             <ul style="padding-left: 1.5rem; margin-top: 1rem;">
-                <li style="margin-bottom: 0.8rem;"><strong>Spatial Scene Understanding:</strong> Grounded language queries for
+                <li style="margin-bottom: 0.8rem;"><strong>Spatial Scene Understanding:</strong> Grounded language
+                    queries for
                     relationships, proximity, and navigation in robotics, assistive systems, and similar settings.</li>
-                <li style="margin-bottom: 0.8rem;"><strong>Novel View Synthesis (NVS):</strong> Rapid architectural visualization where 
-                    designers can navigate camera orbits around semantically identified sub-meshes, useful for scene previsualization 
+                <li style="margin-bottom: 0.8rem;"><strong>Novel View Synthesis (NVS):</strong> Rapid architectural
+                    visualization where
+                    designers can navigate camera orbits around semantically identified sub-meshes, useful for scene
+                    previsualization
                     and spatial layout understanding.</li>
-                <li style="margin-bottom: 0.8rem;"><strong>Semantic Interaction:</strong> Enabling localized NLP-based spatial
+                <li style="margin-bottom: 0.8rem;"><strong>Semantic Interaction:</strong> Enabling localized NLP-based
+                    spatial
                     reasoning within complex physical environments, allowing for grounded semantic queries and
                     interaction layers safely isolated from cloud latency.</li>
             </ul>
@@ -562,33 +634,43 @@
 
 
         <!-- Unique Contributions -->
-        <section id="unique-contributions" class="research-block text-block-full" style="background: linear-gradient(135deg, rgba(100,150,255,0.08) 0%, rgba(150,100,255,0.08) 100%); padding: 2.5rem;">
+        <section id="unique-contributions" class="research-block text-block-full"
+            style="background: linear-gradient(135deg, rgba(100,150,255,0.08) 0%, rgba(150,100,255,0.08) 100%); padding: 2.5rem;">
             <h2 style="text-align: center; margin-bottom: 2rem;">Unique Contributions</h2>
-            
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
                 <div style="background: rgba(0,0,0,0.3); padding: 2rem;">
-                    <h3 style="color: var(--accent1); font-size: 1.2rem; margin-bottom: 1rem;">First Depth-Sensor-Free Scene Graphs</h3>
-                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">SOTA systems (ConceptGraphs, HOV-SG) require RGB-D sensors. This project achieves scene graph extraction from RGB+IMU (monocular RGB with inertial sensors) on consumer hardware.</p>
+                    <h3 style="color: var(--accent1); font-size: 1.2rem; margin-bottom: 1rem;">First Depth-Sensor-Free
+                        Scene Graphs</h3>
+                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">SOTA systems (ConceptGraphs,
+                        HOV-SG) require RGB-D sensors. This project achieves scene graph extraction from RGB+IMU
+                        (monocular RGB with inertial sensors) on consumer hardware.</p>
                     <div style="background: rgba(100,150,255,0.1); padding: 0.8rem; font-size: 0.85rem; color: #aaa;">
-                        <strong style="color: var(--accent1);">Impact:</strong> Removes $400-600 depth sensor barrier<br/>
+                        <strong style="color: var(--accent1);">Impact:</strong> Removes $400-600 depth sensor
+                        barrier<br />
                         <strong style="color: #ffbd2e;">Caveat:</strong> Single-scene validation
                     </div>
                 </div>
-                
+
                 <div style="background: rgba(0,0,0,0.3); padding: 2rem;">
                     <h3 style="color: #10b981; font-size: 1.2rem; margin-bottom: 1rem;">5× Cost Reduction</h3>
-                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">SOTA: $1,400-2,600 (RGB-D sensor + high-end GPU)<br/>This work: $300 (consumer GPU, phone camera)</p>
+                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">SOTA: $1,400-2,600 (RGB-D sensor +
+                        high-end GPU)<br />This work: $300 (consumer GPU, phone camera)</p>
                     <div style="background: rgba(16,185,129,0.1); padding: 0.8rem; font-size: 0.85rem; color: #aaa;">
-                        <strong style="color: #10b981;">Impact:</strong> Enables accessible spatial AI<br/>
-                        <strong style="color: #ffbd2e;">Tradeoff:</strong> Coarser than RGB-D / LiDAR metrology (<a href="#quantitative-validation">validation tables</a>)
+                        <strong style="color: #10b981;">Impact:</strong> Enables accessible spatial AI<br />
+                        <strong style="color: #ffbd2e;">Tradeoff:</strong> Coarser than RGB-D / LiDAR metrology (<a
+                            href="#quantitative-validation">validation tables</a>)
                     </div>
                 </div>
-                
+
                 <div style="background: rgba(0,0,0,0.3); padding: 2rem;">
-                    <h3 style="color: #00f2fe; font-size: 1.2rem; margin-bottom: 1rem;">Semantic Loop Closure Algorithm</h3>
-                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">Novel algorithm reduces SAM 2 temporal fragmentation by 45.8%. Merges split detections based on 3D proximity and class identity.</p>
+                    <h3 style="color: #00f2fe; font-size: 1.2rem; margin-bottom: 1rem;">Semantic Loop Closure Algorithm
+                    </h3>
+                    <p style="font-size: 0.95rem; color: #ccc; margin-bottom: 1rem;">Novel algorithm reduces SAM 2
+                        temporal fragmentation by 45.8%. Merges split detections based on 3D proximity and class
+                        identity.</p>
                     <div style="background: rgba(0,242,254,0.1); padding: 0.8rem; font-size: 0.85rem; color: #aaa;">
-                        <strong style="color: #00f2fe;">Impact:</strong> Addresses foundation model limitations<br/>
+                        <strong style="color: #00f2fe;">Impact:</strong> Addresses foundation model limitations<br />
                         <strong style="color: #10b981;">Result:</strong> 24 fragments → 13 objects
                     </div>
                 </div>
@@ -599,141 +681,197 @@
         <!-- Detailed Comparison -->
         <section id="system-comparison" class="research-block text-block-full">
             <h2 style="text-align: center; margin-bottom: 2rem;">Detailed System Comparison</h2>
-            
+
             <div style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #ccc; background: rgba(0,0,0,0.2);">
+                <table
+                    style="width: 100%; border-collapse: collapse; font-size: 0.9rem; color: #ccc; background: rgba(0,0,0,0.2);">
                     <thead>
                         <tr style="background: rgba(100,150,255,0.1); border-bottom: 2px solid var(--accent1);">
                             <th style="padding: 1rem; text-align: left; font-weight: 600;">Capability</th>
-                            <th style="padding: 1rem; text-align: center;">ConceptGraphs<br/><span style="font-size: 0.8rem; font-weight: 400; color: #888;">(ICRA'24)</span></th>
-                            <th style="padding: 1rem; text-align: center;">HOV-SG<br/><span style="font-size: 0.8rem; font-weight: 400; color: #888;">(RSS'24)</span></th>
-                            <th style="padding: 1rem; text-align: center;">Semantic Gaussians<br/><span style="font-size: 0.8rem; font-weight: 400; color: #888;">(2024)</span></th>
-                            <th style="padding: 1rem; text-align: center; background: rgba(100,150,255,0.15); font-weight: 700; color: #fff;">This Work</th>
+                            <th style="padding: 1rem; text-align: center;">ConceptGraphs<br /><span
+                                    style="font-size: 0.8rem; font-weight: 400; color: #888;">(ICRA'24)</span></th>
+                            <th style="padding: 1rem; text-align: center;">HOV-SG<br /><span
+                                    style="font-size: 0.8rem; font-weight: 400; color: #888;">(RSS'24)</span></th>
+                            <th style="padding: 1rem; text-align: center;">Semantic Gaussians<br /><span
+                                    style="font-size: 0.8rem; font-weight: 400; color: #888;">(2024)</span></th>
+                            <th
+                                style="padding: 1rem; text-align: center; background: rgba(100,150,255,0.15); font-weight: 700; color: #fff;">
+                                This Work</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Core Approach -->
-                        <tr style="background: rgba(255,255,255,0.02);"><td colspan="5" style="padding: 0.8rem; font-weight: 600; color: var(--accent1); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Core Approach</td></tr>
+                        <tr style="background: rgba(255,255,255,0.02);">
+                            <td colspan="5"
+                                style="padding: 0.8rem; font-weight: 600; color: var(--accent1); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                                Core Approach</td>
+                        </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Input Modality</td>
                             <td style="padding: 0.8rem; text-align: center;">RGB-D</td>
                             <td style="padding: 0.8rem; text-align: center;">RGB-D</td>
                             <td style="padding: 0.8rem; text-align: center;">RGB(-D)</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">RGB+IMU</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                RGB+IMU</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Depth Sensor Required</td>
                             <td style="padding: 0.8rem; text-align: center;">✓ Yes</td>
                             <td style="padding: 0.8rem; text-align: center;">✓ Yes</td>
                             <td style="padding: 0.8rem; text-align: center;">○ Optional</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">✗ No</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                ✗ No</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">3D Representation</td>
                             <td style="padding: 0.8rem; text-align: center;">Point clouds</td>
                             <td style="padding: 0.8rem; text-align: center;">Point clouds</td>
                             <td style="padding: 0.8rem; text-align: center;">3D Gaussians</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">3D Gaussians (SuGaR)</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">
+                                3D Gaussians (SuGaR)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Hardware</td>
                             <td style="padding: 0.8rem; text-align: center;">High-end GPU</td>
                             <td style="padding: 0.8rem; text-align: center;">High-end GPU</td>
                             <td style="padding: 0.8rem; text-align: center;">High-end GPU</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">8GB consumer</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                8GB consumer</td>
                         </tr>
-                        
+
                         <!-- Semantic Capabilities -->
-                        <tr style="background: rgba(255,255,255,0.02);"><td colspan="5" style="padding: 0.8rem; font-weight: 600; color: #a855f7; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Semantic Capabilities</td></tr>
+                        <tr style="background: rgba(255,255,255,0.02);">
+                            <td colspan="5"
+                                style="padding: 0.8rem; font-weight: 600; color: #a855f7; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                                Semantic Capabilities</td>
+                        </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Object Detection</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">71% accuracy</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">71%
+                                accuracy</td>
                             <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">SOTA</td>
                             <td style="padding: 0.8rem; text-align: center;">Yes</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08);">52% recall</td>
+                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08);">52%
+                                recall</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Scene Graph</td>
                             <td style="padding: 0.8rem; text-align: center;">✓ Yes</td>
                             <td style="padding: 0.8rem; text-align: center;">✓ Hierarchical</td>
                             <td style="padding: 0.8rem; text-align: center;">✗ No</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">✓ Yes (156 relations)</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                ✓ Yes (156 relations)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Relationship Accuracy</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">88% edges</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">88% edges
+                            </td>
                             <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">SOTA</td>
                             <td style="padding: 0.8rem; text-align: center; color: #666;">N/A</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08);">Qualitative</td>
+                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08);">
+                                Qualitative</td>
                         </tr>
-                        
+
                         <!-- Geometric Capabilities -->
-                        <tr style="background: rgba(255,255,255,0.02);"><td colspan="5" style="padding: 0.8rem; font-weight: 600; color: #ffbd2e; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Geometric Capabilities</td></tr>
+                        <tr style="background: rgba(255,255,255,0.02);">
+                            <td colspan="5"
+                                style="padding: 0.8rem; font-weight: 600; color: #ffbd2e; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                                Geometric Capabilities</td>
+                        </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Metric Scale Recovery</td>
                             <td style="padding: 0.8rem; text-align: center;">✗ No</td>
                             <td style="padding: 0.8rem; text-align: center;">✗ No</td>
                             <td style="padding: 0.8rem; text-align: center;">✗ No</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">✓ Yes (1.83cm)</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                ✓ Yes (1.83cm)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Dimensional Accuracy</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">17.7 cm (validated)</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">
+                                17.7 cm (validated)</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Surface Representation</td>
                             <td style="padding: 0.8rem; text-align: center;">Sparse points</td>
                             <td style="padding: 0.8rem; text-align: center;">Sparse points</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Dense splats</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">Dense (SuGaR)</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Dense
+                                splats</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                Dense (SuGaR)</td>
                         </tr>
-                        
+
                         <!-- Practical Factors -->
-                        <tr style="background: rgba(255,255,255,0.02);"><td colspan="5" style="padding: 0.8rem; font-weight: 600; color: #10b981; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Accessibility</td></tr>
+                        <tr style="background: rgba(255,255,255,0.02);">
+                            <td colspan="5"
+                                style="padding: 0.8rem; font-weight: 600; color: #10b981; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                                Accessibility</td>
+                        </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(255,180,50,0.08);">
                             <td style="padding: 0.8rem; font-weight: 600;">Evaluation Scope</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple datasets</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple buildings</td>
-                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple scenes</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(255,180,50,0.15); font-weight: 600; color: #ffbd2e;">Single scene ⚠️</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple
+                                datasets</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple
+                                buildings</td>
+                            <td style="padding: 0.8rem; text-align: center; font-weight: 600; color: #10b981;">Multiple
+                                scenes</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(255,180,50,0.15); font-weight: 600; color: #ffbd2e;">
+                                Single scene ⚠️</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Total Hardware Cost</td>
                             <td style="padding: 0.8rem; text-align: center;">$1.4K-2.4K+</td>
                             <td style="padding: 0.8rem; text-align: center;">$1.4K-2.4K+</td>
                             <td style="padding: 0.8rem; text-align: center;">$1K-2K+</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">$300</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                $300</td>
                         </tr>
                         <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                             <td style="padding: 0.8rem;">Deployment</td>
                             <td style="padding: 0.8rem; text-align: center;">Research/lab</td>
                             <td style="padding: 0.8rem; text-align: center;">Research/lab</td>
                             <td style="padding: 0.8rem; text-align: center;">Research/lab</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">Consumer laptop</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600; color: var(--accent1);">
+                                Consumer laptop</td>
                         </tr>
                         <tr>
                             <td style="padding: 0.8rem;">Processing Time</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
                             <td style="padding: 0.8rem; text-align: center; color: #888;">Not reported</td>
-                            <td style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">45 minutes</td>
+                            <td
+                                style="padding: 0.8rem; text-align: center; background: rgba(100,150,255,0.08); font-weight: 600;">
+                                45 minutes</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            
+
             <p style="margin-top: 1.5rem; font-size: 0.95rem; color: #ccc;">
                 This table summarizes <strong>modality</strong>, <strong>semantics</strong>, <strong>geometry</strong>,
                 <strong>hardware cost</strong>, and <strong>evaluation scope</strong>
             </p>
-            
+
             <div id="comparison-caveat" style="background: rgba(255,180,50,0.08); padding: 1.5rem; margin-top: 1rem;">
                 <p style="font-size: 0.95rem; color: #ccc; margin: 0; line-height: 1.6;">
-                    <strong style="color: #ffbd2e;">⚠️ Caveat:</strong> Single-scene figures are not interchangeable with SOTA
-                    multi-scene averages or variance reports. Treat any cell-wise comparison as <strong>directional</strong> until
+                    <strong style="color: #ffbd2e;">⚠️ Caveat:</strong> Single-scene figures are not interchangeable
+                    with SOTA
+                    multi-scene averages or variance reports. Treat any cell-wise comparison as
+                    <strong>directional</strong> until
                     matched evaluation exists.
                 </p>
             </div>
@@ -741,75 +879,94 @@
 
         <section id="limitations" class="research-block text-block-full">
             <h2>Limitations &amp; Explainability</h2>
-            <p><a href="#limitation-panels">The three panels below</a> map each limitation to a simple mitigation. The columns assume the same relational use case emphasized
-                in <a href="#conclusion">Conclusion</a> and in the <a href="#downstream-llm-example">downstream LLM example</a>; stricter metrology or detection targets imply RGB-D, multi-view capture, or
+            <p><a href="#limitation-panels">The three panels below</a> map each limitation to a simple mitigation. The
+                columns assume the same relational use case emphasized
+                in <a href="#conclusion">Conclusion</a> and in the <a href="#downstream-llm-example">downstream LLM
+                    example</a>; stricter metrology or detection targets imply RGB-D, multi-view capture, or
                 both.</p>
 
-            <div id="limitation-panels" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+            <div id="limitation-panels"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
                 <!-- Dimensional Accuracy -->
                 <div style="border: 1px solid #333;">
-                    <h4 style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">Dimensional Accuracy</h4>
+                    <h4
+                        style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">
+                        Dimensional Accuracy</h4>
                     <div style="padding: 1.5rem;">
                         <p style="margin-bottom: 1rem;">
                             <strong>Issue:</strong> 17.7cm mean error (vs. 1.83cm trajectory RMSE)
                         </p>
-                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root Causes:</strong></p>
+                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root
+                                Causes:</strong></p>
                         <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
                             <li>RGB+IMU instead of RGB-D (LiDAR achieves &lt;1cm)</li>
                             <li>SAM 2 boundary imprecision (documented limitation)</li>
                             <li>Single-pass capture leads to occlusion and incomplete point clouds</li>
                         </ul>
                         <p style="margin: 0; padding-top: 1rem; border-top: 1px solid #333;">
-                            <strong>Mitigation:</strong> We could use capture the scene from multiple angles to improve dimensional accuracy.
+                            <strong>Mitigation:</strong> We could capture the scene from multiple angles to improve
+                            dimensional accuracy.
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Detection Recall -->
                 <div style="border: 1px solid #333;">
-                    <h4 style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">Detection Recall</h4>
+                    <h4
+                        style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">
+                        Detection Recall</h4>
                     <div style="padding: 1.5rem;">
                         <p style="margin-bottom: 1rem;">
                             <strong>Issue:</strong> 52% recall (13/25 target classes)
                         </p>
-                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root Causes:</strong></p>
+                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root
+                                Causes:</strong></p>
                         <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
                             <li>Zero-shot detection (no training)</li>
                             <li>Occlusion during single-pass capture</li>
                             <li>Small objects (mug, bottle) harder to detect</li>
                         </ul>
                         <p style="margin: 0; padding-top: 1rem; border-top: 1px solid #333;">
-                            <strong>Mitigation:</strong> We could use a more accurate detection model or train a detection model on the dataset to improve detection recall.
+                            <strong>Mitigation:</strong> We could use a more accurate detection model or train a
+                            detection model on the dataset to improve detection recall.
                         </p>
                     </div>
                 </div>
-                
+
                 <!-- Geometric Coverage -->
                 <div style="border: 1px solid #333;">
-                    <h4 style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">Geometric Coverage</h4>
+                    <h4
+                        style="font-size: 1rem; margin: 0; padding: 1rem; text-align: center; border-bottom: 1px solid #333;">
+                        Geometric Coverage</h4>
                     <div style="padding: 1.5rem;">
                         <p style="margin-bottom: 1rem;">
                             <strong>Issue:</strong> Partial object reconstruction
                         </p>
-                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root Causes:</strong></p>
+                        <p style="margin-bottom: 0.5rem; padding-top: 1rem; border-top: 1px solid #333;"><strong>Root
+                                Causes:</strong></p>
                         <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
                             <li>Linear trajectory (not orbital)</li>
                             <li>Occlusion planes along unobserved axes</li>
                             <li>2D mask lifting to incomplete 3D clouds</li>
                         </ul>
                         <p style="margin: 0; padding-top: 1rem; border-top: 1px solid #333;">
-                            <strong>Mitigation:</strong> We could try to capture the scene from multiple angles to improve geometric coverage.
+                            <strong>Mitigation:</strong> We could try to capture the scene from multiple angles to
+                            improve geometric coverage.
                         </p>
                     </div>
                 </div>
             </div>
-            
+
 
             <h3 style="margin-top: 2.5rem; margin-bottom: 1rem;">Future Directions</h3>
-            <p>Having established that depth-sensor-free semantic scene understanding is viable, future work could: (1) improve 
-                detection recall toward ConceptGraphs' 71% through tighter SAM 2 and loop-closure integration, (2) develop quantitative 
-                relationship benchmarks comparable to their 88% edge accuracy, (3) expand spatial predicate vocabulary (orientation, 
-                containment), (4) implement hierarchical room-level organization, and (5) validate on real robotics tasks to 
+            <p>Having established that depth-sensor-free semantic scene understanding is viable, future work could: (1)
+                improve
+                detection recall toward ConceptGraphs' 71% through tighter SAM 2 and loop-closure integration, (2)
+                develop quantitative
+                relationship benchmarks comparable to their 88% edge accuracy, (3) expand spatial predicate vocabulary
+                (orientation,
+                containment), (4) implement hierarchical room-level organization, and (5) validate on real robotics
+                tasks to
                 empirically demonstrate that 17.7cm errors don't impede downstream applications.</p>
         </section>
 
@@ -843,13 +1000,19 @@ Both items are directly above the workdesk placed side by side.
 
             <div class="text-content">
                 <h2>Downstream example: LLM spatial reasoning</h2>
-                <p class="on-page-nav__lede">This section illustrates <strong>impact and applications</strong>: a simple downstream task built on the exported graph.</p>
-                <p>Unlike traditional active VLM pipelines that rely on massive textured splats and often hallucinate scale,
-                    this approach compiles the environment into a structured Topological JSON graph with explicit spatial
+                <p class="on-page-nav__lede">This section illustrates <strong>impact and applications</strong>: a simple
+                    downstream task built on the exported graph.</p>
+                <p>Unlike traditional active VLM pipelines that rely on massive textured splats and often hallucinate
+                    scale,
+                    this approach compiles the environment into a structured Topological JSON graph with explicit
+                    spatial
                     predicates.</p>
-                <p>The intermediate representation reduces a dense point sample to surface-aligned primitives with metric
-                    grounding. When that graph is passed to <strong>Ollama</strong>, the model retrieves relationships and
-                    proximity (e.g. "next to," "directly above," distance estimates), illustrating the intended use case:
+                <p>The intermediate representation reduces a dense point sample to surface-aligned primitives with
+                    metric
+                    grounding. When that graph is passed to <strong>Ollama</strong>, the model retrieves relationships
+                    and
+                    proximity (e.g. "next to," "directly above," distance estimates), illustrating the intended use
+                    case:
                     <strong>relational queries</strong> rather than precise metrology.
                 </p>
             </div>
@@ -859,7 +1022,13 @@ Both items are directly above the workdesk placed side by side.
         <section id="acknowledgements" class="research-block text-block-full" style="margin-top: 4rem; opacity: 0.8;">
             <hr style="border: 0.5px solid var(--border); margin-bottom: 2rem;">
             <h2>Acknowledgements</h2>
-            <p style="color: #aaa; font-style: italic; font-size: 0.95rem;"> This work explores the intersection of 3D Gaussian Splatting and Foundation Models for holistic scene understanding. The author acknowledges the fundamental contributions of the research teams behind <strong>COLMAP</strong>, <strong>3D Gaussian Splatting</strong>, <strong>SuGaR</strong>, <strong>YOLO World</strong>, and <strong>SAM 2</strong>. Furthermore, this work is motivated by the pioneering research in 3D Semantic Scene Graphs, specifically the structural methodologies established by <strong>HOV-SG</strong> and <strong>ConceptGraphs</strong>. This pipeline was developed and optimized on consumer-grade hardware to demonstrate the accessibility of high-fidelity semantic scene reconstruction.
+            <p style="color: #aaa; font-style: italic; font-size: 0.95rem;"> We acknowledge the
+                fundamental contributions of the research teams behind <strong>COLMAP</strong>, <strong>3D Gaussian
+                    Splatting</strong>, <strong>SuGaR</strong>, <strong>YOLO World</strong>, and <strong>SAM 2</strong>.
+                Furthermore, this work is motivated by the pioneering research in 3D Semantic Scene Graphs, specifically
+                the structural methodologies established by <strong>HOV-SG</strong> and <strong>ConceptGraphs</strong>.
+                This pipeline was developed and optimized on consumer-grade hardware to demonstrate the accessibility of
+                high-fidelity semantic scene reconstruction.
             </p>
         </section>
 
@@ -873,7 +1042,8 @@ Both items are directly above the workdesk placed side by side.
                 <span class="site-footer__sep" aria-hidden="true">·</span>
                 <span>© 2026</span>
                 <span class="site-footer__sep" aria-hidden="true">·</span>
-                <a href="https://github.com/pranavdm99/3D-metric-semantic-reconstruction" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://github.com/pranavdm99/3D-metric-semantic-reconstruction" target="_blank"
+                    rel="noopener noreferrer">GitHub</a>
                 <span class="site-footer__sep" aria-hidden="true">·</span>
                 <a href="#top">Back to top</a>
             </p>
